@@ -65,9 +65,6 @@ def main(fileConfig):
     #----------------------------------#
     # Extract Data from the SQL Files  #
     #----------------------------------#
-    #TODO remove
-    count = 0
-
     patientsWithCodes = collections.defaultdict(set)
     patientData = collections.defaultdict(lambda: collections.defaultdict(list))
     with open(fileJournalTable, 'r') as fidJournalTable:
@@ -109,10 +106,6 @@ def main(fileConfig):
                 value2 = float(entries[4])
                 freeText = entries[5] if entries[5] != "null" else ''
 
-                if count > 5000:
-                    break
-                count += 1
-
                 # Update the patient record.
                 patientData[patientID][code].append({"Date": date, "Val1": value1, "Val2": value2, "Text": freeText})
 
@@ -126,8 +119,6 @@ def main(fileConfig):
     filePatientData = os.path.join(dirOutput, "PatientData.tsv")
     with open(filePatientsWithCodes, 'w') as fidPatientsWithCodes:
         for i in patientsWithCodes:
-            if ',' in i:
-                print(i)
             fidPatientsWithCodes.write("{0:s}\t{1:s}\n".format(i, ','.join([str(j) for j in patientsWithCodes[i]])))
 
     with open(filePatientData, 'w') as fidPatientData:
