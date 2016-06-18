@@ -21,8 +21,6 @@ def main(fileConfig):
 
     """
 
-    pass
-
     #-------------------------------------#
     # Parse and Validate Input Parameters #
     #-------------------------------------#
