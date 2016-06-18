@@ -9,7 +9,7 @@ from . import generate_flat_files
 
 
 # Determine the default configuration file to use.
-codeDir = os.path.join(os.path.dirname( __file__ ), os.pardir, os.pardir)
+codeDir = os.path.join(os.path.dirname(__file__), os.pardir, os.pardir)
 configDir = os.path.join(codeDir, "ConfigFiles")
 defaultConfigFile = os.path.join(configDir, "FlatFileGenerationConfig.json")
 
