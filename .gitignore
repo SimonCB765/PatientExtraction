@@ -1,6 +1,9 @@
 # Ignore all files in the Data directory.
 Data/*
 
+# Ignore all files in the Results directory.
+Results/*
+
 # Ignore compiled Python files.
 *.pyc
 
