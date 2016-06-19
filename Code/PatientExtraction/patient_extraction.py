@@ -6,6 +6,7 @@ import os
 import sys
 
 # User imports.
+from . import conditon_code_mappings
 from Utilities import json_to_ascii
 
 # Globals.
@@ -13,6 +14,16 @@ PYVERSION = sys.version_info[0]  # Determine major version number.
 
 
 def main(fileInput, dirOutput, fileConfig):
+    """
+
+    :param fileInput:   The location of the input file containing the case definitions.
+    :type fileInput:    str
+    :param dirOutput:   The location of the directory to write the program output to.
+    :type dirOutput:    str
+    :param fileConfig:  The location of the configuration file.
+    :type fileConfig:   str
+
+    """
 
     #---------------------------------------------#
     # Parse and Validate Configuration Parameters #
@@ -50,3 +61,22 @@ def main(fileInput, dirOutput, fileConfig):
     # Extract parameters.
     dirFlatFiles = parsedArgs["FlatFileDirectory"]
     fileCodeDescriptions = parsedArgs["CodeDescriptionFile"]
+
+    # Setup the log file.
+    fileLog = os.path.join(dirOutput, "PatientExtraction.log")
+
+    # Setup the flat file representation files.
+    filePatientData = os.path.join(dirFlatFiles, "PatientData.tsv")
+    filePatientsWithCodes = os.path.join(dirFlatFiles, "PatientsWithCodes.tsv")
+
+    #-------------------------------------------------#
+    # Determine Mappings Between Conditions and Codes #
+    #-------------------------------------------------#
+    # Create the output file to hold the input file enhanced with all codes (including descendants) and their
+    # descriptions.
+    fileAnnotatedInput = os.path.split(fileInput)[1]
+    fileAnnotatedInput = fileAnnotatedInput.split('.')[0] + "_Annotated." + fileAnnotatedInput.split('.')[1]
+    fileAnnotatedInput = os.path.join(dirOutput, fileAnnotatedInput)
+
+    mapCodeToCondition, conditionRestrictions = conditon_code_mappings.main(
+        fileInput, filePatientsWithCodes, fileCodeDescriptions, fileAnnotatedInput, fileLog)
