@@ -25,12 +25,4 @@ The only valid code flags appear to be
     - This error is quite common, mainly for older dates
 
 ## TODO
-1 Come up with a different and better flat file one record per patient format for the input
-    - Could do it like a fasta type thing with patient ID indicated on first line like: #XXXX
-        - Next lines would all just be CODE,DVal,TVal,VVal,WVal
-        - Or next line could again be subsetted by code, so like: #Code
-            - And then the next ones would get be DVal,TVal,VVal,WVal
-    - Maybe best to turn each patient into a JSON object or XML
-    - Alternatively could do a one line approach similar to taht being used, but with more care over the delimiters and escaping/quoting
-2 Convert the entire QICKD database into this new flat file format
 3 Possibly generate some randomised/shuffled or completely synthetic subset to include online and for testing
