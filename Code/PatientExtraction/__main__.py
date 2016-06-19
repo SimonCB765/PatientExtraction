@@ -7,7 +7,7 @@ import os
 import sys
 
 # User imports.
-#from . import
+from . import patient_extraction
 
 
 #------------------------#
@@ -85,10 +85,4 @@ except Exception as e:
     print("The output directory could not be created - {0:s}".format(str(e)))
     sys.exit()
 
-
-
-print(args)
-overwrite
-dirOutput
-fileInput
-fileConfig
+patient_extraction.main(fileInput, dirOutput, fileConfig)
