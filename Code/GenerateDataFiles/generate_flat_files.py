@@ -21,9 +21,11 @@ def main(fileConfig):
 
     """
 
-    #-------------------------------------#
-    # Parse and Validate Input Parameters #
-    #-------------------------------------#
+    #---------------------------------------------#
+    # Parse and Validate Configuration Parameters #
+    #---------------------------------------------#
+    errorsFound = []
+
     # Parse the JSON file of parameters.
     readParams = open(fileConfig, 'r')
     parsedArgs = json.load(readParams)
@@ -32,7 +34,6 @@ def main(fileConfig):
     readParams.close()
 
     # Check the input directory parameter is correct.
-    errorsFound = []
     if "SQLDataDirectory" not in parsedArgs:
         errorsFound.append("There must be a parameter field called SQLDataDirectory.")
     elif not os.path.isdir(parsedArgs["SQLDataDirectory"]):
