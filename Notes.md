@@ -19,6 +19,10 @@ The only valid code flags appear to be
     - The free text is also likely to cause other problems
     - Probably need to enclose it in quotes and make sure to escape control characters in it
 - I know the file Norman is using has errors in its formatting. There are definitely occasions where two sets of double pipe are right next to each other, e.g. ||||
+- Additional errors in data representation file as you've got things like 86511||136,v=30,v=30||1371|d=2009-09-07||137F||2469,v=130,w=80|d=1995-01-25,v=140,w=85,v=130,w=80||
+    - You can see that code 2469 is actually recorded as being code 2469,v=130,w=80
+    - This occurs because the line in the SQL dump is like 86511,'2469,v=130,w=80','1995-01-25',130.0000,80.0000,null
+    - This error is quite common, mainly for older dates
 
 ## TODO
 1 Come up with a different and better flat file one record per patient format for the input
