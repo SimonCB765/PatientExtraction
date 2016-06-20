@@ -56,7 +56,7 @@ def main(fileInput, filePatientsWithCodes, fileCodeDescriptions, fileOutput, fil
     mapCodeToCondition = defaultdict(lambda: {"Positive": set(), "Negative": set()})
     # Create the mapping from conditions to the list of restrictions on patients having the condition
     # (e.g. date ranges, values, etc.).
-    conditionRestrictions = defaultdict(list)
+    conditionRestrictions = {}
     currentCondition = ""  # The condition for which the codes are currently being gathered.
     with open(fileInput, 'r') as fidInput, open(fileOutput, 'w') as fidOutput, open(fileLog, 'a') as fidLog:
         for line in fidInput:
@@ -64,6 +64,7 @@ def main(fileInput, filePatientsWithCodes, fileCodeDescriptions, fileOutput, fil
                 # Found the start of a condition.
                 fidOutput.write(line)
                 currentCondition = line[1:].strip().replace(' ', '_')
+                conditionRestrictions[currentCondition] = []  # Initialise the condition to having no restrictions.
             elif line[0] == '>':
                 # Found the start of a restriction.
                 fidOutput.write(line)
