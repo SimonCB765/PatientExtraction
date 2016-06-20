@@ -4,13 +4,11 @@
 from collections import defaultdict
 
 
-def main(fileInput, filePatientsWithCodes, fileCodeDescriptions, fileOutput, fileLog):
+def main(fileInput, fileCodeDescriptions, fileOutput, fileLog):
     """
 
     :param fileInput:               The location of the input file containing the case definitions.
     :type fileInput:                str
-    :param filePatientsWithCodes:   The location of the file containing the mapping from codes to patients with them.
-    :type filePatientsWithCodes:    str
     :param fileCodeDescriptions:    The location of the file containing the mapping of codes to their descriptions.
     :type fileCodeDescriptions:     str
     :param fileOutput:              The location of the file to write the annotated input file to.
@@ -38,16 +36,6 @@ def main(fileInput, filePatientsWithCodes, fileCodeDescriptions, fileOutput, fil
             line = line.strip()
             chunks = line.split('\t')
             mapCodeToDescription[chunks[0]] = chunks[1]
-
-    #----------------------------------#
-    # Load the Code to Patient Mapping #
-    #----------------------------------#
-    mapCodeToPatients = {}
-    with open(filePatientsWithCodes, 'r') as fidPatientsWithCodes:
-        for line in fidPatientsWithCodes:
-            line = line.strip()
-            chunks = line.split('\t')
-            mapCodeToPatients[chunks[0]] = set(chunks[1].split(','))
 
     #--------------------------------------------------------------#
     # Generate Code Condition Mappings and Annotate the Input File #

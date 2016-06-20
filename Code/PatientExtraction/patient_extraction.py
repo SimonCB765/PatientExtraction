@@ -78,5 +78,16 @@ def main(fileInput, dirOutput, fileConfig):
     fileAnnotatedInput = fileAnnotatedInput.split('.')[0] + "_Annotated." + fileAnnotatedInput.split('.')[1]
     fileAnnotatedInput = os.path.join(dirOutput, fileAnnotatedInput)
 
+    # Generate the mapping.
     mapCodeToCondition, conditionRestrictions = conditon_code_mappings.main(
-        fileInput, filePatientsWithCodes, fileCodeDescriptions, fileAnnotatedInput, fileLog)
+        fileInput, fileCodeDescriptions, fileAnnotatedInput, fileLog)
+
+    #----------------------------------#
+    # Load the Code to Patient Mapping #
+    #----------------------------------#
+    mapCodeToPatients = {}
+    with open(filePatientsWithCodes, 'r') as fidPatientsWithCodes:
+        for line in fidPatientsWithCodes:
+            line = line.strip()
+            chunks = line.split('\t')
+            mapCodeToPatients[chunks[0]] = set(chunks[1].split(','))
