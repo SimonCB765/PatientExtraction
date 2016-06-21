@@ -78,5 +78,6 @@ def main(fileInput, dirOutput, fileConfig):
     fileAnnotatedInput = fileAnnotatedInput.split('.')[0] + "_Annotated." + fileAnnotatedInput.split('.')[1]
     fileAnnotatedInput = os.path.join(dirOutput, fileAnnotatedInput)
 
+    # Generate the mapping.
     mapCodeToCondition, conditionRestrictions = conditon_code_mappings.main(
         fileInput, filePatientsWithCodes, fileCodeDescriptions, fileAnnotatedInput, fileLog)
