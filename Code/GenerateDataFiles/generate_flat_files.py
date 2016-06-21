@@ -2,7 +2,9 @@
 
 # Python imports.
 import collections
+import datetime
 import json
+import operator
 import os
 import sys
 
@@ -100,7 +102,7 @@ def main(fileConfig):
 
                 patientID = entries[0]
                 code = entries[1].split(',')[0]  # If the code is recorded with its values, then just get the code.
-                date = entries[2]
+                date = datetime.datetime.strptime(entries[2], "%Y-%m-%d")
                 value1 = float(entries[3])
                 value2 = float(entries[4])
                 freeText = entries[5] if entries[5] != "null" else ''
@@ -110,6 +112,16 @@ def main(fileConfig):
 
                 # Update the record of codes associated with patients.
                 patientsWithCodes[code].add(patientID)
+
+    # When a patient has multiple entries for a given code, make sure those entries are saved in chronological order.
+    for i in patientData:
+        for code in patientData[i]:
+            # Sort the entries by date.
+            patientData[i][code] = sorted(patientData[i][code], key=operator.itemgetter("Date"))
+
+            # Turn the date back into a string for writing out.
+            for j in patientData[i][code]:
+                j["Date"] = j["Date"].strftime("%Y-%m-%d")
 
     #--------------------#
     # Output Flat Files  #
