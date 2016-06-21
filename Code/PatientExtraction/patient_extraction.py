@@ -1,6 +1,7 @@
 """Perform the extraction of patients according to supplied case definitions."""
 
 # Python imports.
+from collections import defaultdict
 import json
 import os
 import sys
@@ -79,7 +80,7 @@ def main(fileInput, dirOutput, fileConfig):
     fileAnnotatedInput = os.path.join(dirOutput, fileAnnotatedInput)
 
     # Generate the mapping.
-    mapCodeToCondition, conditionRestrictions = conditon_code_mappings.main(
+    mapCodeToCondition, conditionData = conditon_code_mappings.main(
         fileInput, fileCodeDescriptions, fileAnnotatedInput, fileLog)
 
     #----------------------------------#

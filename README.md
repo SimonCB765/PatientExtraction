@@ -4,6 +4,7 @@
 Codes ending in % are expanded to contain all child codes
 Codes can have no full stops (e.g. 101) or full stops (e.g. 101..)
 Can't combine full stops and %
+Any number of spaces can be left 
 
 \# Name of the condition
 \> MODE {mode}
@@ -18,7 +19,7 @@ Can't combine full stops and %
 - MAX - Select the positive indicator code with the greatest associated value (value 1 (v) not value 2 (w)).
 - MIN - Select the positive indicator code with the smallest associated value (value 1 (v) not value 2 (w)).
 
-{out} should be one of (case insensitive):
+{out} should be one or more of the following separated by spaces (case insensitive):
 
 - CODE - Output the selected code (not compatible with the ALL mode).
 - DATE - Output the date when the selected code was associated with the patient (not compatible with the ALL mode). 
