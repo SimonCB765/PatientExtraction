@@ -66,7 +66,6 @@ def main(fileConfig):
     #----------------------------------#
     # Extract Data from the SQL Files  #
     #----------------------------------#
-    patientsWithCodes = collections.defaultdict(set)
     patientData = collections.defaultdict(lambda: collections.defaultdict(list))
     with open(fileJournalTable, 'r') as fidJournalTable:
         for line in fidJournalTable:
@@ -110,9 +109,6 @@ def main(fileConfig):
                 # Update the patient record.
                 patientData[patientID][code].append({"Date": date, "Val1": value1, "Val2": value2, "Text": freeText})
 
-                # Update the record of codes associated with patients.
-                patientsWithCodes[code].add(patientID)
-
     # When a patient has multiple entries for a given code, make sure those entries are saved in chronological order.
     for i in patientData:
         for code in patientData[i]:
@@ -126,12 +122,7 @@ def main(fileConfig):
     #--------------------#
     # Output Flat Files  #
     #--------------------#
-    filePatientsWithCodes = os.path.join(dirOutput, "PatientsWithCodes.tsv")
     filePatientData = os.path.join(dirOutput, "PatientData.tsv")
-    with open(filePatientsWithCodes, 'w') as fidPatientsWithCodes:
-        for i in patientsWithCodes:
-            fidPatientsWithCodes.write("{0:s}\t{1:s}\n".format(i, ','.join([str(j) for j in patientsWithCodes[i]])))
-
     with open(filePatientData, 'w') as fidPatientData:
         for i in patientData:
             fidPatientData.write("{0:s}\t{1:s}\n".format(i, json.dumps(patientData[i])))
