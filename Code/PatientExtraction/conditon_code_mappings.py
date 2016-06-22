@@ -4,12 +4,8 @@
 from collections import defaultdict
 import re
 
-# Globals.
-VALIDMODECHOICES = ["earliest", "last", "all", "max", "min"]
-VALIDOUTPUTCHOICES = {"code", "date", "count", "value"}
 
-
-def main(fileInput, fileCodeDescriptions, fileOutput, fileLog):
+def main(fileInput, fileCodeDescriptions, fileOutput, fileLog, validModeChoices, validOutputChoices):
     """
 
     :param fileInput:               The location of the input file containing the case definitions.
@@ -20,6 +16,10 @@ def main(fileInput, fileCodeDescriptions, fileOutput, fileLog):
     :type fileOutput:               str
     :param fileLog:                 The location of the log file.
     :type fileLog:                  str
+    :param validModeChoices:        The valid modes for choosing selecting codes.
+    :type validModeChoices:         list
+    :param validOutputChoices:      The valid output options for writing out the results of the patient extraction.
+    :type validOutputChoices:       set
     :return:                        1) A mapping from codes to the conditions that they are positive and negative
                                         indicators of. Each code in the dictionary has as its entry a dictionary
                                         containing two sets:
@@ -74,7 +74,7 @@ def main(fileInput, fileCodeDescriptions, fileOutput, fileLog):
                     # A line recording the mode to use for the condition was found.
                     chunks = controlInfo.split()
                     mode = chunks[1].lower()
-                    if mode not in VALIDMODECHOICES:
+                    if mode not in validModeChoices:
                         # An invalid mode choice was found.
                         fidLog.write(
                             "WARNING: Mode {0:s} for condition {1:s} is not recognised. Replacing with mode 'ALL'.\n"
@@ -87,7 +87,7 @@ def main(fileInput, fileCodeDescriptions, fileOutput, fileLog):
                     # A line recording the output to use for the condition was found.
                     chunks = controlInfo.split()
                     outChoices = [i.lower() for i in chunks[1:]]
-                    invalidOutputChoices = set(outChoices).difference(VALIDOUTPUTCHOICES)
+                    invalidOutputChoices = set(outChoices).difference(validOutputChoices)
                     if invalidOutputChoices:
                         # There are no invalid output choices specified.
                         conditionData[currentCondition]["Out"] = outChoices
@@ -97,7 +97,7 @@ def main(fileInput, fileCodeDescriptions, fileOutput, fileLog):
                             "WARNING: Invalid output choice(s) {0:s} for condition {1:s} were not recognised and have "
                             "been ignored.\n"
                                 .format(','.join([str(i) for i in invalidOutputChoices]), currentCondition))
-                        conditionData[currentCondition]["Out"] = set(outChoices).intersection(VALIDOUTPUTCHOICES)
+                        conditionData[currentCondition]["Out"] = set(outChoices).intersection(validOutputChoices)
                 else:
                     # A line recording a restriction to use for the condition was found.
                     #TODO handle restrictions properly.

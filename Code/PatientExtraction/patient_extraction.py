@@ -53,6 +53,16 @@ def main(fileInput, dirOutput, fileConfig):
     elif not os.path.isfile(parsedArgs["CodeDescriptionFile"]):
         errorsFound.append("The file of code to description mappings does not exist.")
 
+    # Initialise the valid code selection modes.
+    validModeChoices = ["all"]
+    if "ValidModeChoices" in parsedArgs:
+        validModeChoices = parsedArgs["ValidModeChoices"]
+
+    # Initialise the valid output options.
+    validOutputChoices = ["count"]
+    if "ValidOutputChoices" in parsedArgs:
+        validOutputChoices = parsedArgs["ValidOutputChoices"]
+
     # Print error messages.
     if errorsFound:
         print("\n\nThe following errors were encountered while parsing the input parameters:\n")
@@ -81,7 +91,7 @@ def main(fileInput, dirOutput, fileConfig):
 
     # Generate the mapping.
     mapCodeToCondition, conditionData = conditon_code_mappings.main(
-        fileInput, fileCodeDescriptions, fileAnnotatedInput, fileLog)
+        fileInput, fileCodeDescriptions, fileAnnotatedInput, fileLog, validModeChoices, validOutputChoices)
 
     #----------------------------------#
     # Load the Code to Patient Mapping #
