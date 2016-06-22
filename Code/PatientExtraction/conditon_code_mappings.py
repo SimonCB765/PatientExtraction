@@ -4,6 +4,10 @@
 from collections import defaultdict
 import re
 
+# Globals.
+VALIDMODECHOICES = ["earliest", "last", "all", "max", "min"]
+VALIDOUTPUTCHOICES = {"code", "date", "count", "value"}
+
 
 def main(fileInput, fileCodeDescriptions, fileOutput, fileLog):
     """
@@ -67,12 +71,35 @@ def main(fileInput, fileCodeDescriptions, fileOutput, fileLog):
                 controlInfo = line[1:].strip()
 
                 if controlInfo[:4].lower() == "mode":
+                    # A line recording the mode to use for the condition was found.
                     chunks = controlInfo.split()
-                    conditionData[currentCondition]["Mode"] = chunks[1]
+                    mode = chunks[1].lower()
+                    if mode not in VALIDMODECHOICES:
+                        # An invalid mode choice was found.
+                        fidLog.write(
+                            "WARNING: Mode {0:s} for condition {1:s} is not recognised. Replacing with mode 'ALL'.\n"
+                                .format(mode, currentCondition))
+                        conditionData[currentCondition]["Mode"] = "all"
+                    else:
+                        # The mode is valid.
+                        conditionData[currentCondition]["Mode"] = chunks[1]
                 elif controlInfo[:3].lower() == "out":
+                    # A line recording the output to use for the condition was found.
                     chunks = controlInfo.split()
-                    conditionData[currentCondition]["Out"] = chunks[1:]
+                    outChoices = [i.lower() for i in chunks[1:]]
+                    invalidOutputChoices = set(outChoices).difference(VALIDOUTPUTCHOICES)
+                    if invalidOutputChoices:
+                        # There are no invalid output choices specified.
+                        conditionData[currentCondition]["Out"] = outChoices
+                    else:
+                        # An invalid output choice was supplied.
+                        fidLog.write(
+                            "WARNING: Invalid output choice(s) {0:s} for condition {1:s} were not recognised and have "
+                            "been ignored.\n"
+                                .format(','.join([str(i) for i in invalidOutputChoices]), currentCondition))
+                        conditionData[currentCondition]["Out"] = set(outChoices).intersection(VALIDOUTPUTCHOICES)
                 else:
+                    # A line recording a restriction to use for the condition was found.
                     #TODO handle restrictions properly.
                     pass
             else:
