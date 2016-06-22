@@ -2,15 +2,14 @@
 
 # Python imports.
 from collections import defaultdict
+import re
 
 
-def main(fileInput, filePatientsWithCodes, fileCodeDescriptions, fileOutput, fileLog):
+def main(fileInput, fileCodeDescriptions, fileOutput, fileLog):
     """
 
     :param fileInput:               The location of the input file containing the case definitions.
     :type fileInput:                str
-    :param filePatientsWithCodes:   The location of the file containing the mapping from codes to patients with them.
-    :type filePatientsWithCodes:    str
     :param fileCodeDescriptions:    The location of the file containing the mapping of codes to their descriptions.
     :type fileCodeDescriptions:     str
     :param fileOutput:              The location of the file to write the annotated input file to.
@@ -22,9 +21,13 @@ def main(fileInput, filePatientsWithCodes, fileCodeDescriptions, fileOutput, fil
                                         containing two sets:
                                         "Positive" - the conditions for which it is a positive indicator
                                         "Negative" - the conditions for which it is a negative indicator
-                                    2) A mapping from conditions to the restrictions they place on patients having it.
-                                        For example, a code for the condition must be in a date range, or a value
-                                        associated with a positive indicator code for the condition must be in a range.
+                                    2) A mapping from conditions to information about the mde, output and restrictions
+                                        to be used when finding patients with the condition. The three entries for each
+                                        condition are:
+                                        "Mode" - a string indicating the patient's codes that should be selected
+                                        "Out" - a list of strings indicating what should be output about the patient
+                                        "Restrictions" - a list of restrictions on which patients should be deemed to
+                                            have the condition
     :rtype:                         dict, dict
 
     """
@@ -39,38 +42,39 @@ def main(fileInput, filePatientsWithCodes, fileCodeDescriptions, fileOutput, fil
             chunks = line.split('\t')
             mapCodeToDescription[chunks[0]] = chunks[1]
 
-    #----------------------------------#
-    # Load the Code to Patient Mapping #
-    #----------------------------------#
-    mapCodeToPatients = {}
-    with open(filePatientsWithCodes, 'r') as fidPatientsWithCodes:
-        for line in fidPatientsWithCodes:
-            line = line.strip()
-            chunks = line.split('\t')
-            mapCodeToPatients[chunks[0]] = set(chunks[1].split(','))
-
     #--------------------------------------------------------------#
     # Generate Code Condition Mappings and Annotate the Input File #
     #--------------------------------------------------------------#
     # Create the mapping from codes to the conditions that it is a positive and negative indicator of.
     mapCodeToCondition = defaultdict(lambda: {"Positive": set(), "Negative": set()})
-    # Create the mapping from conditions to the list of restrictions on patients having the condition
-    # (e.g. date ranges, values, etc.).
-    conditionRestrictions = {}
+    # Create the mapping from conditions to information about the extraction mode, desired output and the
+    # restrictions on patients having the condition (e.g. date ranges, values, etc.).
+    conditionData = {}
     currentCondition = ""  # The condition for which the codes are currently being gathered.
     with open(fileInput, 'r') as fidInput, open(fileOutput, 'w') as fidOutput, open(fileLog, 'a') as fidLog:
         for line in fidInput:
             if line[0] == '#':
                 # Found the start of a condition.
                 fidOutput.write(line)
-                currentCondition = line[1:].strip().replace(' ', '_')
-                conditionRestrictions[currentCondition] = []  # Initialise the condition to having no restrictions.
+                line = line[1:].strip()
+                currentCondition = re.sub("\s+", '_', line)
+
+                # Initialise the mapping recording mode, output and patient restrictions for this condition.
+                conditionData[currentCondition] = {"Mode": "all", "Out": ["count"], "Restrictions": []}
             elif line[0] == '>':
-                # Found the start of a restriction.
+                # Found the start of mode, output or restriction information.
                 fidOutput.write(line)
-                restriction = line[1:].strip()
-                #TODO handle restrictions properly.
-                #conditionRestrictions[currentCondition].append(restriction)
+                controlInfo = line[1:].strip()
+
+                if controlInfo[:4].lower() == "mode":
+                    chunks = controlInfo.split()
+                    conditionData[currentCondition]["Mode"] = chunks[1]
+                elif controlInfo[:3].lower() == "out":
+                    chunks = controlInfo.split()
+                    conditionData[currentCondition]["Out"] = chunks[1:]
+                else:
+                    #TODO handle restrictions properly.
+                    pass
             else:
                 # Found a code for the current condition.
                 code = line.strip().replace('.', '')
@@ -108,4 +112,4 @@ def main(fileInput, filePatientsWithCodes, fileCodeDescriptions, fileOutput, fil
                         fidOutput.write("{0:s}{1:.<5}\tCode not recognised\n".format(negationIndicator, i))
                         fidLog.write("WARNING: Code {0:s} was not found in the dictionary.\n".format(i))
 
-    return mapCodeToCondition, conditionRestrictions
+    return mapCodeToCondition, conditionData

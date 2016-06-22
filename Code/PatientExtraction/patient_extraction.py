@@ -1,6 +1,7 @@
 """Perform the extraction of patients according to supplied case definitions."""
 
 # Python imports.
+from collections import defaultdict
 import json
 import os
 import sys
@@ -79,5 +80,15 @@ def main(fileInput, dirOutput, fileConfig):
     fileAnnotatedInput = os.path.join(dirOutput, fileAnnotatedInput)
 
     # Generate the mapping.
-    mapCodeToCondition, conditionRestrictions = conditon_code_mappings.main(
-        fileInput, filePatientsWithCodes, fileCodeDescriptions, fileAnnotatedInput, fileLog)
+    mapCodeToCondition, conditionData = conditon_code_mappings.main(
+        fileInput, fileCodeDescriptions, fileAnnotatedInput, fileLog)
+
+    #----------------------------------#
+    # Load the Code to Patient Mapping #
+    #----------------------------------#
+    mapCodeToPatients = {}
+    with open(filePatientsWithCodes, 'r') as fidPatientsWithCodes:
+        for line in fidPatientsWithCodes:
+            line = line.strip()
+            chunks = line.split('\t')
+            mapCodeToPatients[chunks[0]] = set(chunks[1].split(','))

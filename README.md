@@ -4,6 +4,33 @@
 Codes ending in % are expanded to contain all child codes
 Codes can have no full stops (e.g. 101) or full stops (e.g. 101..)
 Can't combine full stops and %
+Any number of spaces can be left 
+
+\# Name of the condition
+\> MODE {mode}
+\> OUT {out}
+^-?[a-zA-Z0-9]{1,5}(\\.*|%)$
+
+{mode} should be one of (case insensitive):
+
+- EARLIEST - Select the earliest positive indicator code for the condition.
+- LAST - Select the most recent positive indicator code for the condition.
+- ALL - (Default value) Select all positive indicator codes for the condition.
+- MAX - Select the positive indicator code with the greatest associated value (value 1 (v) not value 2 (w)).
+- MIN - Select the positive indicator code with the smallest associated value (value 1 (v) not value 2 (w)).
+
+{out} should be one or more of the following separated by spaces (case insensitive):
+
+- CODE - Output the selected code (not compatible with the ALL mode).
+- DATE - Output the date when the selected code was associated with the patient (not compatible with the ALL mode). 
+- COUNT - (Default value) Output the number of times the selected code was associated with the patient.
+- VALUE - Output the value associated with the selected code (not compatible with the ALL mode).
+
+Examples of valid codes:
+
+- C10E
+- -1sd..
+- ABC%
 
 ## Generate Data Files
 Config file needs to contain the following fields:
