@@ -20,11 +20,11 @@ def main(fileInput, fileCodeDescriptions, fileOutput, fileLog, validModeChoices,
     :type validModeChoices:         list
     :param validOutputChoices:      The valid output options for writing out the results of the patient extraction.
     :type validOutputChoices:       set
-    :return:                        1) A mapping from codes to the conditions that they are positive and negative
-                                        indicators of. Each code in the dictionary has as its entry a dictionary
+    :return:                        1) A mapping from conditions to the codes that are positive and negative indicators
+                                        of it. Each condition in the dictionary has as its entry a dictionary
                                         containing two sets:
-                                        "Positive" - the conditions for which it is a positive indicator
-                                        "Negative" - the conditions for which it is a negative indicator
+                                        "Positive" - the codes that are positive indicators for the condition
+                                        "Negative" - the codes that are negative indicators for the condition
                                     2) A mapping from conditions to information about the mde, output and restrictions
                                         to be used when finding patients with the condition. The three entries for each
                                         condition are:
@@ -49,8 +49,8 @@ def main(fileInput, fileCodeDescriptions, fileOutput, fileLog, validModeChoices,
     #--------------------------------------------------------------#
     # Generate Code Condition Mappings and Annotate the Input File #
     #--------------------------------------------------------------#
-    # Create the mapping from codes to the conditions that it is a positive and negative indicator of.
-    mapCodeToCondition = defaultdict(lambda: {"Positive": set(), "Negative": set()})
+    # Create the mapping from conditions to the codes that are positive and negative indicators of it.
+    mapConditionToCode = defaultdict(lambda: {"Positive": set(), "Negative": set()})
     # Create the mapping from conditions to information about the extraction mode, desired output and the
     # restrictions on patients having the condition (e.g. date ranges, values, etc.).
     conditionData = {}
@@ -128,7 +128,7 @@ def main(fileInput, fileCodeDescriptions, fileOutput, fileLog, validModeChoices,
                 # input file annotated with code descriptions.
                 for i in codeList:
                     # Add the code as an indicator for the current condition.
-                    mapCodeToCondition[i]["Negative" if isNegativeCode else "Positive"].add(currentCondition)
+                    mapConditionToCode[currentCondition]["Negative" if isNegativeCode else "Positive"].add(i)
 
                     # Write out the code and its description.
                     if i in mapCodeToDescription:
@@ -139,4 +139,4 @@ def main(fileInput, fileCodeDescriptions, fileOutput, fileLog, validModeChoices,
                         fidOutput.write("{0:s}{1:.<5}\tCode not recognised\n".format(negationIndicator, i))
                         fidLog.write("WARNING: Code {0:s} was not found in the dictionary.\n".format(i))
 
-    return mapCodeToCondition, conditionData
+    return mapConditionToCode, conditionData
