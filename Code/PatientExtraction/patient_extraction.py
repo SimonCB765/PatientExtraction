@@ -14,7 +14,7 @@ from Utilities import json_to_ascii
 # Globals.
 PYVERSION = sys.version_info[0]  # Determine major version number.
 VALIDMODECHOICES = ["earliest", "last", "all", "max", "min"]  # Initialise the valid code selection modes.
-VALIDOUTPUTCHOICES = {"code", "date", "count", "value"}  # Initialise the valid output options.
+VALIDOUTPUTCHOICES = {"code", "count", "date", "max", "mean", "min", "value"}  # Initialise the valid output options.
 
 
 def main(fileInput, dirOutput, fileConfig):
