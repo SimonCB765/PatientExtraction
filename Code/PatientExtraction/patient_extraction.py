@@ -206,42 +206,28 @@ def select_associations(medicalRecord, patientPosCondCodes, mode="all"):
 
     selectedRecords = {}  # The selected associations between patients and codes that meet the criteria.
 
-    if mode == "all":
-        # Select all associations between the positive indicator codes and the patient.
-        selectedRecords = {i: medicalRecord[i] for i in patientPosCondCodes}
-    elif mode == "earliest":
+    # Select all associations between the positive indicator codes and the patient.
+    selectedRecords = {i: medicalRecord[i] for i in patientPosCondCodes}
+
+    if mode == "earliest":
         # Select the earliest association between one of the positive indicator codes and the patient.
-        for i in patientPosCondCodes:
-            selectedRecords[i] = medicalRecord[i][0]
-            selectedRecords[i]["Date"] = datetime.datetime.strptime(selectedRecords[i]["Date"], "%Y-%m-%d")
-        earliestRecord = min(selectedRecords.items(), key=lambda x: x[1]["Date"])
-        selectedRecords = {earliestRecord[0]: [earliestRecord[1]]}
-        for i in selectedRecords:
-            selectedRecords[i][0]["Date"] = selectedRecords[i][0]["Date"].strftime("%Y-%m-%d")
+        earliestRecord = min(selectedRecords.items(), key=lambda x: datetime.datetime.strptime(x[1][0]["Date"],
+                                                                                               "%Y-%m-%d"))
+        selectedRecords = {earliestRecord[0]: [earliestRecord[1][0]]}
     elif mode == "last":
         # Select the latest association between one of the positive indicator codes and the patient.
-        for i in patientPosCondCodes:
-            selectedRecords[i] = medicalRecord[i][0]
-            selectedRecords[i]["Date"] = datetime.datetime.strptime(selectedRecords[i]["Date"], "%Y-%m-%d")
-        latestRecord = min(selectedRecords.items(), key=lambda x: x[1]["Date"])
-        selectedRecords = {latestRecord[0]: [latestRecord[1]]}
-        for i in selectedRecords:
-            selectedRecords[i][0]["Date"] = selectedRecords[i][0]["Date"].strftime("%Y-%m-%d")
+        latestRecord = max(selectedRecords.items(), key=lambda x: datetime.datetime.strptime(x[1][0]["Date"],
+                                                                                             "%Y-%m-%d"))
+        selectedRecords = {latestRecord[0]: [latestRecord[1][0]]}
     elif mode == "max":
         # Select the association between one of the positive indicator codes and the patient that
         # contains the greatest value.
-        keyFunction = operator.itemgetter("Val1")
-        for i in patientPosCondCodes:
-            selectedRecords[i] = max(medicalRecord[i], key=keyFunction)
-        maxRecord = max(selectedRecords.items(), key=lambda x: x[1]["Val1"])
-        selectedRecords = {maxRecord[0]: [maxRecord[1]]}
+        maxRecord = max(selectedRecords.items(), key=lambda x: x[1][0]["Val1"])
+        selectedRecords = {maxRecord[0]: [maxRecord[1][0]]}
     elif mode == "min":
         # Select the association between one of the positive indicator codes and the patient that
         # contains the smallest value.
-        keyFunction = operator.itemgetter("Val1")
-        for i in patientPosCondCodes:
-            selectedRecords[i] = min(medicalRecord[i], key=keyFunction)
-        minRecord = min(selectedRecords.items(), key=lambda x: x[1]["Val1"])
-        selectedRecords = {minRecord[0]: [minRecord[1]]}
+        minRecord = min(selectedRecords.items(), key=lambda x: x[1][0]["Val1"])
+        selectedRecords = {minRecord[0]: [minRecord[1][0]]}
 
     return selectedRecords
