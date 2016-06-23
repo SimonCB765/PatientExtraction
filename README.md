@@ -4,11 +4,20 @@
 Codes ending in % are expanded to contain all child codes
 Codes can have no full stops (e.g. 101) or full stops (e.g. 101..)
 Can't combine full stops and %
-Any number of spaces can be left 
+Any number of restrictions can be provided, they will be ANDed together
+Consecutive whitespace in the name will be converted to a single underscore
+Multiple value and date range restrictions can be provided by having more than one line.
+At least one whitespace character is needed as a separator between:
+
+- The word MODE and the mode choice
+- The word OUT and the output choices
+- Each output choice
+- To delimit the separate parts of the restrictions (e.g. between from and the first date)
 
 \# Name of the condition
 \> MODE {mode}
 \> OUT {out}
+\> {restriction}
 ^-?[a-zA-Z0-9]{1,5}(\\.*|%)$
 
 {mode} should be one of (case insensitive):
@@ -28,6 +37,16 @@ Any number of spaces can be left
 - MEAN - Output the mean value (value 1 (v) not value 2 (w)) associated with the selected codes.
 - MIN - Output the minimum value (value 1 (v) not value 2 (w)) associated with the selected codes.
 - VALUE - Output the value (value 1 (v) not value 2 (w)) associated with the selected code (if the ALL mode is used this will output an arbitrary value).
+
+Each {restriction} line should contain one of (case insensitive):
+
+- A date range in the form - from YYYY-MM-DD to YYYY-MM-DD
+    - This will select patients between the two dates (inclusively)
+    - The second date must be more recent than the first one
+- A value range meeting the following criteria:
+    - The expression is of the form: x OP value
+    - x is a numeric value
+    - OP can be one of <, <=, > or >=
 
 Examples of valid codes:
 

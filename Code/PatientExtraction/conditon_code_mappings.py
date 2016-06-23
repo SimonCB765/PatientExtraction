@@ -2,6 +2,8 @@
 
 # Python imports.
 from collections import defaultdict
+import datetime
+import numbers
 import re
 
 
@@ -68,16 +70,18 @@ def main(fileInput, fileCodeDescriptions, fileOutput, fileLog, validModeChoices,
                 conditionsFound.append(currentCondition)
 
                 # Initialise the mapping recording mode, output and patient restrictions for this condition.
-                conditionData[currentCondition] = {"Mode": "all", "Out": ["count"], "Restrictions": []}
+                conditionData[currentCondition] = {"Mode": "all",
+                                                   "Out": ["count"],
+                                                   "Restrictions": {"Dates": [], "Values": []}}
             elif line[0] == '>':
                 # Found the start of mode, output or restriction information.
                 fidOutput.write(line)
-                controlInfo = line[1:].strip()
+                controlInfo = line[1:].strip().lower()
 
-                if controlInfo[:4].lower() == "mode":
+                if controlInfo[:4] == "mode":
                     # A line recording the mode to use for the condition was found.
                     chunks = controlInfo.split()
-                    mode = chunks[1].lower()
+                    mode = chunks[1]
                     if mode not in validModeChoices:
                         # An invalid mode choice was found.
                         fidLog.write(
@@ -87,25 +91,64 @@ def main(fileInput, fileCodeDescriptions, fileOutput, fileLog, validModeChoices,
                     else:
                         # The mode is valid.
                         conditionData[currentCondition]["Mode"] = chunks[1]
-                elif controlInfo[:3].lower() == "out":
+                elif controlInfo[:3] == "out":
                     # A line recording the output to use for the condition was found.
                     chunks = controlInfo.split()
-                    outChoices = [i.lower() for i in chunks[1:]]
+                    outChoices = [i for i in chunks[1:]]
                     invalidOutputChoices = set(outChoices).difference(validOutputChoices)
                     if invalidOutputChoices:
-                        # There are no invalid output choices specified.
-                        conditionData[currentCondition]["Out"] = outChoices
-                    else:
                         # An invalid output choice was supplied.
                         fidLog.write(
                             "WARNING: Invalid output choice(s) {0:s} for condition {1:s} were not recognised and have "
                             "been ignored.\n"
                                 .format(','.join([str(i) for i in invalidOutputChoices]), currentCondition))
                         conditionData[currentCondition]["Out"] = set(outChoices).intersection(validOutputChoices)
+                    else:
+                        # There are no invalid output choices specified.
+                        conditionData[currentCondition]["Out"] = outChoices
                 else:
                     # A line recording a restriction to use for the condition was found.
-                    #TODO handle restrictions properly.
-                    pass
+                    chunks = re.split("\s+", controlInfo)
+                    print(chunks)
+                    if "from" in controlInfo:
+                        # The restriction involves dates.
+                        startDate = datetime.datetime.strptime(chunks[1], "%Y-%m-%d")
+                        endDate = datetime.datetime.strptime(chunks[3], "%Y-%m-%d")
+                        if endDate < startDate:
+                            fidLog.write(
+                                "WARNING: End date before start date for condition {0:s}'s restriction line \"{1:s}\". "
+                                "The restriction has been ignored.\n".format(currentCondition, controlInfo))
+                        else:
+                            conditionData[currentCondition]["Restrictions"]["Dates"].append((startDate, endDate))
+                    elif "value" in controlInfo:
+                        # The restriction involves values.
+                        if len(chunks) != 3:
+                            # The restriction is not of the correct form.
+                            fidLog.write(
+                                "WARNING: The value restriction \"{0:s}\" for condition {1:s} is not formatted "
+                                "correctly and has been ignored.\n".format(controlInfo, currentCondition))
+                        else:
+                            # The restriction has the correct number of parts.
+                            if chunks[1] not in ['<', "<=", '>', ">="]:
+                                # The operator is missing.
+                                fidLog.write(
+                                    "WARNING: The value restriction \"{0:s}\" for condition {1:s} should have one of "
+                                    "<, <=, > or >= as the 2nd element. The restriction has been ignored.\n"
+                                        .format(controlInfo, currentCondition))
+                            try:
+                                value = float(chunks[2])
+                                conditionData[currentCondition]["Restrictions"]["Values"].append((chunks[1], value))
+                            except ValueError:
+                                # The value supplied could not be converted to a float.
+                                fidLog.write(
+                                    "WARNING: The value restriction \"{0:s}\" for condition {1:s} should have a number "
+                                    "as the 3rd element. The restriction has been ignored.\n"
+                                        .format(controlInfo, currentCondition))
+                    else:
+                        # The restriction is not recognised.
+                        fidLog.write(
+                            "WARNING: The mode, output or restriction line \"{0:s}\" for condition {1:s} was not "
+                            "recognised and has been ignored.\n".format(controlInfo, currentCondition))
             else:
                 # Found a code for the current condition.
                 code = line.strip().replace('.', '')
