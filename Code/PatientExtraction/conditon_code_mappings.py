@@ -32,7 +32,9 @@ def main(fileInput, fileCodeDescriptions, fileOutput, fileLog, validModeChoices,
                                         "Out" - a list of strings indicating what should be output about the patient
                                         "Restrictions" - a list of restrictions on which patients should be deemed to
                                             have the condition
-    :rtype:                         dict, dict
+                                    3) The conditions that the user has requested patients data for in the order that
+                                        they appear in the input file.
+    :rtype:                         dict, dict, list
 
     """
 
@@ -49,6 +51,7 @@ def main(fileInput, fileCodeDescriptions, fileOutput, fileLog, validModeChoices,
     #--------------------------------------------------------------#
     # Generate Code Condition Mappings and Annotate the Input File #
     #--------------------------------------------------------------#
+    conditionsFound = []  # List of the conditions the user requested patient data for.
     # Create the mapping from conditions to the codes that are positive and negative indicators of it.
     mapConditionToCode = defaultdict(lambda: {"Positive": set(), "Negative": set()})
     # Create the mapping from conditions to information about the extraction mode, desired output and the
@@ -62,6 +65,7 @@ def main(fileInput, fileCodeDescriptions, fileOutput, fileLog, validModeChoices,
                 fidOutput.write(line)
                 line = line[1:].strip()
                 currentCondition = re.sub("\s+", '_', line)
+                conditionsFound.append(currentCondition)
 
                 # Initialise the mapping recording mode, output and patient restrictions for this condition.
                 conditionData[currentCondition] = {"Mode": "all", "Out": ["count"], "Restrictions": []}
@@ -139,4 +143,4 @@ def main(fileInput, fileCodeDescriptions, fileOutput, fileLog, validModeChoices,
                         fidOutput.write("{0:s}{1:.<5}\tCode not recognised\n".format(negationIndicator, i))
                         fidLog.write("WARNING: Code {0:s} was not found in the dictionary.\n".format(i))
 
-    return mapConditionToCode, conditionData
+    return mapConditionToCode, conditionData, conditionsFound
