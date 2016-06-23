@@ -109,7 +109,6 @@ def main(fileInput, fileCodeDescriptions, fileOutput, fileLog, validModeChoices,
                 else:
                     # A line recording a restriction to use for the condition was found.
                     chunks = re.split("\s+", controlInfo)
-                    print(chunks)
                     if "from" in controlInfo:
                         # The restriction involves dates.
                         startDate = datetime.datetime.strptime(chunks[1], "%Y-%m-%d")
