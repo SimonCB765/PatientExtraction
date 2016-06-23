@@ -71,7 +71,6 @@ def main(fileInput, dirOutput, fileConfig):
 
     # Setup the flat file representation files.
     filePatientData = os.path.join(dirFlatFiles, "PatientData.tsv")
-    filePatientsWithCodes = os.path.join(dirFlatFiles, "PatientsWithCodes.tsv")
 
     #-------------------------------------------------#
     # Determine Mappings Between Conditions and Codes #
@@ -91,15 +90,23 @@ def main(fileInput, dirOutput, fileConfig):
     #---------------------------------------------------#
     # Select and Output the Desired Patient Information #
     #---------------------------------------------------#
-    with open(filePatientData, 'r') as fidPatientData:
+    fileExtractedData = os.path.join(dirOutput, "ExtractedData.tsv")
+    with open(filePatientData, 'r') as fidPatientData, open(fileExtractedData, 'w') as fidExtractedData:
+        # Write out the header for the output file.
+        header = "PatientID\t{0:s}\n".format(
+            '\t'.join(
+                ['\t'.join(["{0:s}_{1:s}".format(i, j) for j in conditionData[i]["Out"]]) for i in conditionsFound]))
+        fidExtractedData.write(header)
+
         for line in fidPatientData:
             # Load the patient's data.
             chunks = (line.strip()).split('\t')
             patientID = chunks[0]
             medicalRecord = json.loads(chunks[1])
+            patientRecordSubset = {}  # The subset of the patient's medical record that meets condition criteria.
             codesAssociatedWith = set(medicalRecord)  # The codes the patient is associated with.
 
-            for i in mapConditionToCode:
+            for i in conditionsFound:
                 # Get the positive and negative indicator codes for the current condition.
                 positiveCodes = mapConditionToCode[i]["Positive"]  # Positive indicator codes for the condition.
                 negativeCodes = mapConditionToCode[i]["Negative"]  # Negative indicator codes for the condition.
@@ -110,28 +117,78 @@ def main(fileInput, dirOutput, fileConfig):
                 if patientPosCondCodes and not patientNegCondCodes:
                     # If the patient contains at least one positive code for the condition and no negative codes for
                     # the condition, then the patient has the condition.
-                    print(patientID, i, patientPosCondCodes)
 
                     # Extract the needed code association records.
                     selectedRecords = select_associations(medicalRecord, patientPosCondCodes, conditionData[i]["Mode"])
+                    patientRecordSubset[i] = selectedRecords
 
-                    print(patientID, selectedRecords)
-                    print("\n")
+            # Generate the required output.
+            generatedOutput = generate_patient_output(patientID, patientRecordSubset, conditionsFound, conditionData)
 
-                    conditionsFound
+            # Write out the patient's data.
+            fidExtractedData.write("{0:s}\n".format(generatedOutput))
 
-                    # Generate the required output.
-                    if conditionData[i]["Out"] == "code":
-                        pass
-                    if conditionData[i]["Out"] == "date":
-                        pass
-                    if conditionData[i]["Out"] == "count":
-                        pass
-                    if conditionData[i]["Out"] == "value":
-                        pass
 
-        print("\n\n")
-        print(conditionData)
+def generate_patient_output(patientID, patientRecordSubset, conditions, conditionData):
+    """Generate the output string for a given patient.
+
+    :param patientID:           The patient's ID.
+    :type patientID:            str
+    :param patientRecordSubset: The subset of the patient's medical record containing codes indicating a condition.
+                                    This maps conditions to a dictionary where the keys are the codes the patient
+                                    has that positively indicate for the condition, and the entries contain the data
+                                    about the associations between the code and the patient.
+    :type patientRecordSubset:  dict
+    :param conditions:          The conditions that the user wants patients for.
+    :type conditions:           list
+    :param conditionData:       The data about the conditions (mode, output choices and restrictions).
+    :type conditionData         dict
+    :return:                    The extracted patient data.
+    :rtype:                     str
+
+    """
+
+    generatedOutput = patientID  # The output string for the patient.
+
+    for i in conditions:
+        if i in patientRecordSubset:
+            # If the patient has the condition.
+            for j in conditionData[i]["Out"]:
+                if j == "count":
+                    lengths = map(len, [patientRecordSubset[i][k] for k in patientRecordSubset[i]])
+                    count = sum(lengths)
+                    generatedOutput += "\t{0:d}".format(count)
+                elif j == "max":
+                    maxValue = max([l for k in patientRecordSubset[i] for l in patientRecordSubset[i][k]],
+                                   key=operator.itemgetter("Val1"))["Val1"]
+                    generatedOutput += "\t{0:.2f}".format(maxValue)
+                elif j == "mean":
+                    associations = [l for k in patientRecordSubset[i] for l in patientRecordSubset[i][k]]
+                    meanValue = sum([k["Val1"] for k in associations]) / len(associations)
+                    generatedOutput += "\t{0:.2f}".format(meanValue)
+                elif j == "min":
+                    minValue = min([l for k in patientRecordSubset[i] for l in patientRecordSubset[i][k]],
+                                   key=operator.itemgetter("Val1"))["Val1"]
+                    generatedOutput += "\t{0:.2f}".format(minValue)
+                else:
+                    # Output choices where a positive indicator code is required to be selected first, so get an
+                    # arbitrary positive indicator code for the condition that the patient is associated with.
+                    code = next(iter(patientRecordSubset[i]))
+                    if j == "value":
+                        # Get an arbitrary value associated with the code.
+                        value = patientRecordSubset[i][code][0]["Val1"]
+                        generatedOutput += "\t{0:.2f}".format(value)
+                    elif j == "date":
+                        # Get an arbitrary date associated with the code.
+                        date = patientRecordSubset[i][code][0]["Date"]
+                        generatedOutput += "\t{0:s}".format(date)
+                    else:
+                        # Output choice is CODE.
+                        generatedOutput += "\t{0:s}".format(code)
+        else:
+            generatedOutput += ''.join(['\t' for j in conditionData[i]["Out"]])
+
+    return generatedOutput
 
 
 def select_associations(medicalRecord, patientPosCondCodes, mode="all"):
