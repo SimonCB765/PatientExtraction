@@ -21,13 +21,13 @@ Any number of spaces can be left
 
 {out} should be one or more of the following separated by spaces (case insensitive):
 
-- CODE - Output the selected code (not compatible with the ALL mode).
+- CODE - Output the selected code (if the ALL mode is used this will output an arbitrary code).
 - COUNT - (Default value) Output the number of times the selected code was associated with the patient.
-- DATE - Output the date when the selected code was associated with the patient (not compatible with the ALL mode).
+- DATE - Output the date when the selected code was associated with the patient (if the ALL mode is used this will output an arbitrary date).
 - MAX - Output the maximum value (value 1 (v) not value 2 (w)) associated with the selected codes.
 - MEAN - Output the mean value (value 1 (v) not value 2 (w)) associated with the selected codes.
 - MIN - Output the minimum value (value 1 (v) not value 2 (w)) associated with the selected codes.
-- VALUE - Output the value (value 1 (v) not value 2 (w)) associated with the selected code (not compatible with the ALL mode).
+- VALUE - Output the value (value 1 (v) not value 2 (w)) associated with the selected code (if the ALL mode is used this will output an arbitrary value).
 
 Examples of valid codes:
 
