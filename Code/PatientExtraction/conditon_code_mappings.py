@@ -3,7 +3,7 @@
 # Python imports.
 from collections import defaultdict
 import datetime
-import numbers
+import operator
 import re
 
 
@@ -72,7 +72,7 @@ def main(fileInput, fileCodeDescriptions, fileOutput, fileLog, validModeChoices,
                 # Initialise the mapping recording mode, output and patient restrictions for this condition.
                 conditionData[currentCondition] = {"Mode": "all",
                                                    "Out": ["count"],
-                                                   "Restrictions": {"Dates": [], "Values": []}}
+                                                   "Restrictions": {"Date": [], "Val1": []}}
             elif line[0] == '>':
                 # Found the start of mode, output or restriction information.
                 fidOutput.write(line)
@@ -119,7 +119,9 @@ def main(fileInput, fileCodeDescriptions, fileOutput, fileLog, validModeChoices,
                                 "WARNING: End date before start date for condition {0:s}'s restriction line \"{1:s}\". "
                                 "The restriction has been ignored.\n".format(currentCondition, controlInfo))
                         else:
-                            conditionData[currentCondition]["Restrictions"]["Dates"].append((startDate, endDate))
+                            # Create the function to use to perform the restriction.
+                            comparisonFunc = lambda x: operator.le(x, endDate) and operator.ge(x, startDate)
+                            conditionData[currentCondition]["Restrictions"]["Date"].append(comparisonFunc)
                     elif "value" in controlInfo:
                         # The restriction involves values.
                         if len(chunks) != 3:
@@ -137,7 +139,16 @@ def main(fileInput, fileCodeDescriptions, fileOutput, fileLog, validModeChoices,
                                         .format(controlInfo, currentCondition))
                             try:
                                 value = float(chunks[2])
-                                conditionData[currentCondition]["Restrictions"]["Values"].append((chunks[1], value))
+                                comparisonFunc = None  # The function to use to perform the restriction.
+                                if chunks[1] == '<':
+                                    comparisonFunc = lambda x: operator.lt(x, value)
+                                elif chunks[1] == "<=":
+                                    comparisonFunc = lambda x: operator.le(x, value)
+                                elif chunks[1] == '>':
+                                    comparisonFunc = lambda x: operator.gt(x, value)
+                                elif chunks[1] == ">=":
+                                    comparisonFunc = lambda x: operator.ge(x, value)
+                                conditionData[currentCondition]["Restrictions"]["Val1"].append(comparisonFunc)
                             except ValueError:
                                 # The value supplied could not be converted to a float.
                                 fidLog.write(
