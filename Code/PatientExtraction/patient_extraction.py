@@ -85,8 +85,6 @@ def main(fileInput, dirOutput, fileConfig):
     mapConditionToCode, conditionData, conditionsFound = conditon_code_mappings.main(
         fileInput, fileCodeDescriptions, fileAnnotatedInput, fileLog, VALIDMODECHOICES, VALIDOUTPUTCHOICES)
 
-    #TODO - add a check for the mode and outputs being compatible, and if not change them, log them, output warnings
-
     #---------------------------------------------------#
     # Select and Output the Desired Patient Information #
     #---------------------------------------------------#
