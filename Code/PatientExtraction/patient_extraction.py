@@ -104,6 +104,11 @@ def main(fileInput, dirOutput, fileConfig):
             patientRecordSubset = {}  # The subset of the patient's medical record that meets condition criteria.
             codesAssociatedWith = set(medicalRecord)  # The codes the patient is associated with.
 
+            # Convert all dates to datetime objects.
+            for i in medicalRecord:
+                for j in medicalRecord[i]:
+                    j["Date"] = datetime.datetime.strptime(j["Date"], "%Y-%m-%d")
+
             for i in conditionsFound:
                 # Get the positive and negative indicator codes for the current condition.
                 positiveCodes = mapConditionToCode[i]["Positive"]  # Positive indicator codes for the condition.
@@ -117,8 +122,12 @@ def main(fileInput, dirOutput, fileConfig):
                     # the condition, then the patient has the condition.
 
                     # Extract the needed code association records.
-                    selectedRecords = select_associations(medicalRecord, patientPosCondCodes, conditionData[i]["Mode"])
-                    patientRecordSubset[i] = selectedRecords
+                    selectedRecords = select_associations(medicalRecord, patientPosCondCodes,
+                                                          conditionData[i]["Restrictions"], conditionData[i]["Mode"])
+                    if selectedRecords:
+                        # If some associations between the patient and the positive indicator codes for the
+                        # condition meet the restriction criteria for the condition, then record this.
+                        patientRecordSubset[i] = selectedRecords
 
             # Generate the required output.
             generatedOutput = generate_patient_output(patientID, patientRecordSubset, conditionsFound, conditionData)
@@ -179,7 +188,7 @@ def generate_patient_output(patientID, patientRecordSubset, conditions, conditio
                     elif j == "date":
                         # Get an arbitrary date associated with the code.
                         date = patientRecordSubset[i][code][0]["Date"]
-                        generatedOutput += "\t{0:s}".format(date)
+                        generatedOutput += "\t{0:s}".format(date.strftime("%Y-%m-%d"))
                     else:
                         # Output choice is CODE.
                         generatedOutput += "\t{0:s}".format(code)
@@ -189,25 +198,36 @@ def generate_patient_output(patientID, patientRecordSubset, conditions, conditio
     return generatedOutput
 
 
-def select_associations(medicalRecord, patientPosCondCodes, mode="all"):
-    """Select information about the associations between a patient and their codes according to a specified mode.
+def select_associations(medicalRecord, patientPosCondCodes, conditionRestrictions, mode="all"):
+    """Select information about the associations between a patient and their codes according to a mode and restrictions.
 
-    :param medicalRecord:       A patient's medical record.
-    :type medicalRecord:        dict
-    :param patientPosCondCodes: The positive indicator codes that a patient has for a given condition.
-    :type patientPosCondCodes:  set
-    :param mode:                The method for selecting which associations between the patient and their codes should
-                                be selected.
-    :type mode:                 str
-    :return:                    The selected associations between patients and codes that meet the criteria.
-    :rtype:                     dict
+    :param medicalRecord:           A patient's medical record.
+    :type medicalRecord:            dict
+    :param patientPosCondCodes:     The positive indicator codes that a patient has for a given condition.
+    :type patientPosCondCodes:      set
+    :param conditionRestrictions:   The data about the condition restrictions.
+    :type conditionRestrictions     dict
+    :param mode:                    The method for selecting which associations between the patient and their codes
+                                        should be selected.
+    :type mode:                     str
+    :return:                        The selected associations between patients and codes that meet the criteria.
+    :rtype:                         dict
 
     """
 
-    selectedRecords = {}  # The selected associations between patients and codes that meet the criteria.
-
     # Select all associations between the positive indicator codes and the patient.
     selectedRecords = {i: medicalRecord[i] for i in patientPosCondCodes}
+
+    # Remove associations that do not meet the restriction criteria.
+    for i in conditionRestrictions:
+        # Go through each possible category of restrictions (dates, values, etc.).
+        for j in conditionRestrictions[i]:
+            # Apply each individual restriction to the set of selected records to filter out those records not
+            # meeting the present restriction.
+            selectedRecords = {k: [l for l in selectedRecords[k] if j(l[i])] for k in selectedRecords}
+
+    # Filter out the codes that have no associations with the patient that satisfy the restriction criteria.
+    selectedRecords = {i: selectedRecords[i] for i in selectedRecords if selectedRecords[i]}
 
     if mode == "earliest":
         # Select the earliest association between one of the positive indicator codes and the patient.
