@@ -231,13 +231,11 @@ def select_associations(medicalRecord, patientPosCondCodes, conditionRestriction
 
     if mode == "earliest":
         # Select the earliest association between one of the positive indicator codes and the patient.
-        earliestRecord = min(selectedRecords.items(), key=lambda x: datetime.datetime.strptime(x[1][0]["Date"],
-                                                                                               "%Y-%m-%d"))
+        earliestRecord = min(selectedRecords.items(), key=lambda x: x[1][0]["Date"])
         selectedRecords = {earliestRecord[0]: [earliestRecord[1][0]]}
     elif mode == "last":
         # Select the latest association between one of the positive indicator codes and the patient.
-        latestRecord = max(selectedRecords.items(), key=lambda x: datetime.datetime.strptime(x[1][0]["Date"],
-                                                                                             "%Y-%m-%d"))
+        latestRecord = max(selectedRecords.items(), key=lambda x: x[1][-1]["Date"])
         selectedRecords = {latestRecord[0]: [latestRecord[1][0]]}
     elif mode == "max":
         # Select the association between one of the positive indicator codes and the patient that
