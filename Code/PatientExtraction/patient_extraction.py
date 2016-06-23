@@ -18,7 +18,7 @@ VALIDOUTPUTCHOICES = {"code", "count", "date", "max", "mean", "min", "value"}  #
 
 
 def main(fileInput, dirOutput, fileConfig):
-    """
+    """Run the patient extraction.
 
     :param fileInput:   The location of the input file containing the case definitions.
     :type fileInput:    str
