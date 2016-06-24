@@ -44,11 +44,8 @@ def main(fileInput, dirOutput, fileConfig):
     # Check that the flat file input directory parameter is correct.
     if "FlatFileDirectory" not in parsedArgs:
         errorsFound.append("There must be a parameter field called FlatFileDirectory.")
-    try:
-        os.makedirs(parsedArgs["FlatFileDirectory"])
-    except FileExistsError:
-        # Directory already exists.
-        pass
+    elif not os.path.isdir(parsedArgs["FlatFileDirectory"]):
+        errorsFound.append("The input data directory does not exist.")
 
     # Check that the file containing the mapping from codes to descriptions is present.
     if "CodeDescriptionFile" not in parsedArgs:
