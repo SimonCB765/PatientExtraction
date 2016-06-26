@@ -18,6 +18,8 @@ PYVERSION = sys.version_info[0]  # Determine major version number.
 def main(fileConfig):
     """Generate the flat files to use for the patient extraction.
 
+    The SQL file that the data is read from is assumed to have all patient entries listed consecutively.
+
     :param fileConfig:   The location of the file containing the flat file generation arguments in JSON format.
     :type fileConfig:    str
 
@@ -63,10 +65,19 @@ def main(fileConfig):
     # Get the files for the SQL table we're interested in the journal table).
     fileJournalTable = os.path.join(dirSQLFiles, "journal.sql")
 
+    # Setup the output file for the patient data.
+    filePatientData = os.path.join(dirOutput, "PatientData.tsv")
+    try:
+        os.remove(filePatientData)
+    except FileNotFoundError:
+        # The file does not exist so no need to do anything.
+        pass
+
     #----------------------------------#
     # Extract Data from the SQL Files  #
     #----------------------------------#
-    patientData = collections.defaultdict(lambda: collections.defaultdict(list))
+    currentPatient = None  # The ID of the patient who's record is currently being built.
+    patientData = collections.defaultdict(list)  # The data for the current patient.
     with open(fileJournalTable, 'r') as fidJournalTable:
         for line in fidJournalTable:
             if line[:6] == "insert":
@@ -106,23 +117,41 @@ def main(fileConfig):
                 value2 = float(entries[4])
                 freeText = entries[5] if entries[5] != "null" else ''
 
-                # Update the patient record.
-                patientData[patientID][code].append({"Date": date, "Val1": value1, "Val2": value2, "Text": freeText})
+                if patientID != currentPatient and currentPatient:
+                    # A new patient has been found and this is not the first line of the file.
+                    save_patient(currentPatient, patientData, filePatientData)  # Record the old patient's data.
+                    patientData = collections.defaultdict(list)  # Clear the patient data.
 
-    # When a patient has multiple entries for a given code, make sure those entries are saved in chronological order.
-    for i in patientData:
-        for code in patientData[i]:
-            # Sort the entries by date.
-            patientData[i][code] = sorted(patientData[i][code], key=operator.itemgetter("Date"))
+                # Update the patient's data.
+                currentPatient = patientID
+                patientData[code].append({"Date": date, "Val1": value1, "Val2": value2, "Text": freeText})
 
-            # Turn the date back into a string for writing out.
-            for j in patientData[i][code]:
-                j["Date"] = j["Date"].strftime("%Y-%m-%d")
+    # Record the final patient's data.
+    save_patient(currentPatient, patientData, filePatientData)
 
-    #--------------------#
-    # Output Flat Files  #
-    #--------------------#
-    filePatientData = os.path.join(dirOutput, "PatientData.tsv")
-    with open(filePatientData, 'w') as fidPatientData:
-        for i in patientData:
-            fidPatientData.write("{0:s}\t{1:s}\n".format(i, json.dumps(patientData[i])))
+
+def save_patient(patientID, patientData, filePatientData):
+    """
+
+    :param patientID:
+    :type patientID:
+    :param patientData:
+    :type patientData:
+    :param filePatientData:
+    :type filePatientData:
+
+    """
+
+    # When the patient has multiple entries for a given code, make sure those entries are saved in
+    # chronological order.
+    for code in patientData:
+        # Sort the entries by date.
+        patientData[code] = sorted(patientData[code], key=operator.itemgetter("Date"))
+
+        # Turn the date back into a string for writing out.
+        for j in patientData[code]:
+            j["Date"] = j["Date"].strftime("%Y-%m-%d")
+
+    # Output the current patient's data.
+    with open(filePatientData, 'a') as fidPatientData:
+        fidPatientData.write("{0:s}\t{1:s}\n".format(patientID, json.dumps(patientData)))
