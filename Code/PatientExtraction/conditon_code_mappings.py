@@ -62,7 +62,11 @@ def main(fileInput, fileCodeDescriptions, fileOutput, fileLog, validModeChoices,
     currentCondition = ""  # The condition for which the codes are currently being gathered.
     with open(fileInput, 'r') as fidInput, open(fileOutput, 'w') as fidOutput, open(fileLog, 'a') as fidLog:
         for line in fidInput:
-            if line[0] == '#':
+            line = line.strip()
+            if not line:
+                # The line is empty.
+                pass
+            elif line[0] == '#':
                 # Found the start of a condition.
                 fidOutput.write(line)
                 line = line[1:].strip()
