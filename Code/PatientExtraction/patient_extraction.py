@@ -244,8 +244,8 @@ def select_associations(medicalRecord, patientPosCondCodes, conditionRestriction
 
     """
 
-    # Create a copy of the associations between the positive indicator codes and the patient.
-    selectedRecords = dict(medicalRecord)
+    # Select all associations between the positive indicator codes and the patient.
+    selectedRecords = {i: medicalRecord[i] for i in patientPosCondCodes}
 
     # Remove associations that do not meet the restriction criteria.
     for i in conditionRestrictions:
