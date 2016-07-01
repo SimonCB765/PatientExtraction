@@ -68,7 +68,7 @@ def main(fileInput, fileCodeDescriptions, fileOutput, fileLog, validModeChoices,
                 pass
             elif line[0] == '#':
                 # Found the start of a condition.
-                fidOutput.write(line)
+                fidOutput.write("{0:s}\n".format(line))
                 line = line[1:].strip()
                 currentCondition = re.sub("\s+", '_', line)
                 conditionsFound.append(currentCondition)
@@ -79,7 +79,7 @@ def main(fileInput, fileCodeDescriptions, fileOutput, fileLog, validModeChoices,
                                                    "Restrictions": {"Date": [], "Val1": []}}
             elif line[0] == '>':
                 # Found the start of mode, output or restriction information.
-                fidOutput.write(line)
+                fidOutput.write("{0:s}\n".format(line))
                 line = re.sub("\s+", ' ', line)  # Turn consecutive whitespace into a single space.
                 controlInfo = line[1:].strip().lower()
 
