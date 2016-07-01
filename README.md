@@ -1,6 +1,8 @@
 # PatientExtraction
 
 ## Input File Format
+if the exact same condition name is used more than once, then the last one takes precendence
+    all information from previous occurences are removed
 Codes ending in % are expanded to contain all child codes
 Codes can have no full stops (e.g. 101) or full stops (e.g. 101..)
 Can't combine full stops and %

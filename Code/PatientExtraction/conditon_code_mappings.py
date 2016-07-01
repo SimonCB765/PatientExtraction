@@ -71,6 +71,11 @@ def main(fileInput, fileCodeDescriptions, fileOutput, fileLog, validModeChoices,
                 fidOutput.write("{0:s}\n".format(line))
                 line = line[1:].strip()
                 currentCondition = re.sub("\s+", '_', line)
+                if currentCondition in conditionsFound:
+                    # Remove the current condition from its place in the list of conditions if you've found it again.
+                    conditionsFound.remove(currentCondition)
+                    # Remove the old record of which codes are positive/negative for the condition.
+                    del mapConditionToCode[currentCondition]
                 conditionsFound.append(currentCondition)
 
                 # Initialise the mapping recording mode, output and patient restrictions for this condition.
