@@ -171,15 +171,18 @@ def generate_patient_output(patientID, patientRecordSubset, conditions, conditio
                             count = sum(lengths)
                             generatedOutput += "\t{0:d}".format(count)
                         elif out == "max":
-                            maxValue = max([l for k in patientRecordSubset[i][mode] for l in patientRecordSubset[i][mode][k]],
+                            maxValue = max([l for k in patientRecordSubset[i][mode]
+                                            for l in patientRecordSubset[i][mode][k]],
                                            key=operator.itemgetter("Val1"))["Val1"]
                             generatedOutput += "\t{0:.2f}".format(maxValue)
                         elif out == "mean":
-                            associations = [l for k in patientRecordSubset[i][mode] for l in patientRecordSubset[i][mode][k]]
+                            associations = [l for k in patientRecordSubset[i][mode]
+                                            for l in patientRecordSubset[i][mode][k]]
                             meanValue = sum([k["Val1"] for k in associations]) / len(associations)
                             generatedOutput += "\t{0:.2f}".format(meanValue)
                         elif out == "min":
-                            minValue = min([l for k in patientRecordSubset[i][mode] for l in patientRecordSubset[i][mode][k]],
+                            minValue = min([l for k in patientRecordSubset[i][mode]
+                                            for l in patientRecordSubset[i][mode][k]],
                                            key=operator.itemgetter("Val1"))["Val1"]
                             generatedOutput += "\t{0:.2f}".format(minValue)
                         else:
