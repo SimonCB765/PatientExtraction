@@ -273,7 +273,6 @@ def select_associations(medicalRecord, patientPosCondCodes, conditionRestriction
             # association in the record is the earliest.
             earliestCode = earliestRecord[0]
             earliestAssociation = earliestRecord[1][0]  # The first (and therefore earliest) association with the code.
-            selectedRecords = {earliestCode: [earliestAssociation]}
             modeSelectedRecords[mode] = {earliestCode: [earliestAssociation]}
         elif mode == "latest":
             # Select the latest association between one of the positive indicator codes and the patient.
@@ -287,20 +286,27 @@ def select_associations(medicalRecord, patientPosCondCodes, conditionRestriction
             # association in the record is the latest.
             latestCode = latestRecord[0]
             latestAssociation = latestRecord[1][-1]  # The last (and therefore latest) association with the code.
-            selectedRecords = {latestCode: [latestAssociation]}
             modeSelectedRecords[mode] = {latestCode: [latestAssociation]}
         elif mode == "max":
-            # Select the association between one of the positive indicator codes and the patient that
-            # contains the greatest value.
-            maxRecord = max(selectedRecords.items(), key=lambda x: x[1][0]["Val1"])
-            selectedRecords = {maxRecord[0]: [maxRecord[1][0]]}
-            modeSelectedRecords[mode] = {maxRecord[0]: [maxRecord[1][0]]}
+            # Select the positive indicator code that has an association with the patient that contains the
+            # greatest value.
+            maxRecord = max(selectedRecords.items(), key=lambda x: max([i["Val1"] for i in x[1]]))
+
+            # Determine the code associated with the max value and its association with the patient that actually has
+            # the max value.
+            maxCode = maxRecord[0]
+            maxAssociation = max(maxRecord[1], key=lambda x: x["Val1"])
+            modeSelectedRecords[mode] = {maxCode: [maxAssociation]}
         elif mode == "min":
             # Select the association between one of the positive indicator codes and the patient that
             # contains the smallest value.
-            minRecord = min(selectedRecords.items(), key=lambda x: x[1][0]["Val1"])
-            selectedRecords = {minRecord[0]: [minRecord[1][0]]}
-            modeSelectedRecords[mode] = {minRecord[0]: [minRecord[1][0]]}
+            minRecord = min(selectedRecords.items(), key=lambda x: min([i["Val1"] for i in x[1]]))
+
+            # Determine the code associated with the min value and its association with the patient that actually has
+            # the min value.
+            minCode = minRecord[0]
+            minAssociation = min(minRecord[1], key=lambda x: x["Val1"])
+            modeSelectedRecords[mode] = {minCode: [minAssociation]}
         else:
             # Selecting all codes.
             modeSelectedRecords[mode] = dict(selectedRecords)
