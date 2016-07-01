@@ -286,7 +286,7 @@ def select_associations(medicalRecord, patientPosCondCodes, conditionRestriction
             # the latest occurring code. Due to the way associations are stored (chronologically) the last
             # association in the record is the latest.
             latestCode = latestRecord[0]
-            latestAssociation = latestRecord[1][0]  # The last (and therefore latest) association with the code.
+            latestAssociation = latestRecord[1][-1]  # The last (and therefore latest) association with the code.
             selectedRecords = {latestCode: [latestAssociation]}
             modeSelectedRecords[mode] = {latestCode: [latestAssociation]}
         elif mode == "max":
