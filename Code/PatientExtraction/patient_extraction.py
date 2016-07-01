@@ -13,7 +13,7 @@ from Utilities import json_to_ascii
 
 # Globals.
 PYVERSION = sys.version_info[0]  # Determine major version number.
-VALIDMODECHOICES = ["earliest", "last", "all", "max", "min"]  # Initialise the valid code selection modes.
+VALIDMODECHOICES = ["earliest", "latest", "all", "max", "min"]  # Initialise the valid code selection modes.
 VALIDOUTPUTCHOICES = {"code", "count", "date", "max", "mean", "min", "value"}  # Initialise the valid output options.
 
 
@@ -90,7 +90,10 @@ def main(fileInput, dirOutput, fileConfig):
         # Write out the header for the output file.
         header = "PatientID\t{0:s}\n".format(
             '\t'.join(
-                ['\t'.join(["{0:s}_{1:s}".format(i, j) for j in conditionData[i]["Out"]]) for i in conditionsFound]))
+                ['\t'.join(
+                    ["{0:s}__MODE:{1:s}__OUT:{2:s}".format(i, j, k) for j in conditionData[i]["Mode"]
+                     for k in conditionData[i]["Out"]])
+                 for i in conditionsFound]))
         fidExtractedData.write(header)
 
         for line in fidPatientData:
@@ -121,9 +124,11 @@ def main(fileInput, dirOutput, fileConfig):
                     # Extract the needed code association records.
                     selectedRecords = select_associations(medicalRecord, patientPosCondCodes,
                                                           conditionData[i]["Restrictions"], conditionData[i]["Mode"])
+
+                    # Only update the patient's record subset if there are any modes that contain positive indicator
+                    # codes for the condition meeting the condition's restriction criteria.
+                    selectedRecords = {j: selectedRecords[j] for j in selectedRecords if selectedRecords[j]}
                     if selectedRecords:
-                        # If some associations between the patient and the positive indicator codes for the
-                        # condition meet the restriction criteria for the condition, then record this.
                         patientRecordSubset[i] = selectedRecords
 
             # Generate the required output.
@@ -157,45 +162,52 @@ def generate_patient_output(patientID, patientRecordSubset, conditions, conditio
     for i in conditions:
         if i in patientRecordSubset:
             # If the patient has the condition.
-            for j in conditionData[i]["Out"]:
-                if j == "count":
-                    lengths = map(len, [patientRecordSubset[i][k] for k in patientRecordSubset[i]])
-                    count = sum(lengths)
-                    generatedOutput += "\t{0:d}".format(count)
-                elif j == "max":
-                    maxValue = max([l for k in patientRecordSubset[i] for l in patientRecordSubset[i][k]],
-                                   key=operator.itemgetter("Val1"))["Val1"]
-                    generatedOutput += "\t{0:.2f}".format(maxValue)
-                elif j == "mean":
-                    associations = [l for k in patientRecordSubset[i] for l in patientRecordSubset[i][k]]
-                    meanValue = sum([k["Val1"] for k in associations]) / len(associations)
-                    generatedOutput += "\t{0:.2f}".format(meanValue)
-                elif j == "min":
-                    minValue = min([l for k in patientRecordSubset[i] for l in patientRecordSubset[i][k]],
-                                   key=operator.itemgetter("Val1"))["Val1"]
-                    generatedOutput += "\t{0:.2f}".format(minValue)
+            for mode in conditionData[i]["Mode"]:
+                if mode in patientRecordSubset[i]:
+                    # If using the given mode managed to collect any associations.
+                    for out in conditionData[i]["Out"]:
+                        if out == "count":
+                            lengths = map(len, [patientRecordSubset[i][k] for k in patientRecordSubset[i][mode]])
+                            count = sum(lengths)
+                            generatedOutput += "\t{0:d}".format(count)
+                        elif out == "max":
+                            maxValue = max([l for k in patientRecordSubset[i][mode] for l in patientRecordSubset[i][mode][k]],
+                                           key=operator.itemgetter("Val1"))["Val1"]
+                            generatedOutput += "\t{0:.2f}".format(maxValue)
+                        elif out == "mean":
+                            associations = [l for k in patientRecordSubset[i][mode] for l in patientRecordSubset[i][mode][k]]
+                            meanValue = sum([k["Val1"] for k in associations]) / len(associations)
+                            generatedOutput += "\t{0:.2f}".format(meanValue)
+                        elif out == "min":
+                            minValue = min([l for k in patientRecordSubset[i][mode] for l in patientRecordSubset[i][mode][k]],
+                                           key=operator.itemgetter("Val1"))["Val1"]
+                            generatedOutput += "\t{0:.2f}".format(minValue)
+                        else:
+                            # Output choices where a positive indicator code is required to be selected first, so get an
+                            # arbitrary positive indicator code for the condition that the patient is associated with.
+                            code = next(iter(patientRecordSubset[i][mode]))
+                            if out == "value":
+                                # Get an arbitrary value associated with the code.
+                                value = patientRecordSubset[i][mode][code][0]["Val1"]
+                                generatedOutput += "\t{0:.2f}".format(value)
+                            elif out == "date":
+                                # Get an arbitrary date associated with the code.
+                                date = patientRecordSubset[i][mode][code][0]["Date"]
+                                generatedOutput += "\t{0:s}".format(date.strftime("%Y-%m-%d"))
+                            else:
+                                # Output choice is CODE.
+                                generatedOutput += "\t{0:s}".format(code)
                 else:
-                    # Output choices where a positive indicator code is required to be selected first, so get an
-                    # arbitrary positive indicator code for the condition that the patient is associated with.
-                    code = next(iter(patientRecordSubset[i]))
-                    if j == "value":
-                        # Get an arbitrary value associated with the code.
-                        value = patientRecordSubset[i][code][0]["Val1"]
-                        generatedOutput += "\t{0:.2f}".format(value)
-                    elif j == "date":
-                        # Get an arbitrary date associated with the code.
-                        date = patientRecordSubset[i][code][0]["Date"]
-                        generatedOutput += "\t{0:s}".format(date.strftime("%Y-%m-%d"))
-                    else:
-                        # Output choice is CODE.
-                        generatedOutput += "\t{0:s}".format(code)
+                    # Add blanks for each column associated with this mode, as using it we didn't get any association.
+                    generatedOutput += ''.join(['\t' for j in conditionData[i]["Out"]])
         else:
-            generatedOutput += ''.join(['\t' for j in conditionData[i]["Out"]])
+            # Add blanks for each column if the patient doesn't have the condition.
+            generatedOutput += ''.join(['\t' for j in conditionData[i]["Mode"] for k in conditionData[i]["Out"]])
 
     return generatedOutput
 
 
-def select_associations(medicalRecord, patientPosCondCodes, conditionRestrictions, mode="all"):
+def select_associations(medicalRecord, patientPosCondCodes, conditionRestrictions, modes=("all")):
     """Select information about the associations between a patient and their codes according to a mode and restrictions.
 
     :param medicalRecord:           A patient's medical record.
@@ -204,16 +216,36 @@ def select_associations(medicalRecord, patientPosCondCodes, conditionRestriction
     :type patientPosCondCodes:      set
     :param conditionRestrictions:   The data about the condition restrictions.
     :type conditionRestrictions     dict
-    :param mode:                    The method for selecting which associations between the patient and their codes
+    :param modes:                   The method(s) for selecting which associations between the patient and their codes
                                         should be selected.
-    :type mode:                     str
+    :type modes:                    list
     :return:                        The selected associations between patients and codes that meet the criteria.
+                                        There is one entry in the dictionary per mode used. For each mode key in the
+                                        dictionary, the associated value is the dictionary of associations between
+                                        the patient and codes that meet the criteria, selected based on the mode.
+                                        An example of the return dictionary is:
+                                        {
+                                            'ALL':
+                                                {
+                                                    'C10E': [{'Date': datetime, 'Text': '..', 'Val1': 0.0, 'Val2': 0.0},
+                                                             {'Date': datetime, 'Text': '..', 'Val1': 0.0, 'Val2': 0.0},
+                                                             ...
+                                                            ]
+                                                    'C10F': [{'Date': datetime, 'Text': '..', 'Val1': 0.0, 'Val2': 0.0},
+                                                             {'Date': datetime, 'Text': '..', 'Val1': 0.0, 'Val2': 0.0},
+                                                             ...
+                                                            ],
+                                                    ...
+                                                }
+                                            'MAX': {'XXX': [{'Date': datetime, 'Text': '..', 'Val1': 5.5, 'Val2': 0.0}]}
+                                            ...
+                                        }
     :rtype:                         dict
 
     """
 
-    # Select all associations between the positive indicator codes and the patient.
-    selectedRecords = {i: medicalRecord[i] for i in patientPosCondCodes}
+    # Create a copy of the associations between the positive indicator codes and the patient.
+    selectedRecords = dict(medicalRecord)
 
     # Remove associations that do not meet the restriction criteria.
     for i in conditionRestrictions:
@@ -223,26 +255,54 @@ def select_associations(medicalRecord, patientPosCondCodes, conditionRestriction
             # meeting the present restriction.
             selectedRecords = {k: [l for l in selectedRecords[k] if j(l[i])] for k in selectedRecords}
 
-    # Filter out the codes that have no associations with the patient that satisfy the restriction criteria.
+    # Filter out the codes that have no associations with the patient that satisfy the restriction criteria (i.e.
+    # remove all codes that now contain no associations in the selected records).
     selectedRecords = {i: selectedRecords[i] for i in selectedRecords if selectedRecords[i]}
 
-    if mode == "earliest":
-        # Select the earliest association between one of the positive indicator codes and the patient.
-        earliestRecord = min(selectedRecords.items(), key=lambda x: x[1][0]["Date"])
-        selectedRecords = {earliestRecord[0]: [earliestRecord[1][0]]}
-    elif mode == "last":
-        # Select the latest association between one of the positive indicator codes and the patient.
-        latestRecord = max(selectedRecords.items(), key=lambda x: x[1][-1]["Date"])
-        selectedRecords = {latestRecord[0]: [latestRecord[1][0]]}
-    elif mode == "max":
-        # Select the association between one of the positive indicator codes and the patient that
-        # contains the greatest value.
-        maxRecord = max(selectedRecords.items(), key=lambda x: x[1][0]["Val1"])
-        selectedRecords = {maxRecord[0]: [maxRecord[1][0]]}
-    elif mode == "min":
-        # Select the association between one of the positive indicator codes and the patient that
-        # contains the smallest value.
-        minRecord = min(selectedRecords.items(), key=lambda x: x[1][0]["Val1"])
-        selectedRecords = {minRecord[0]: [minRecord[1][0]]}
+    modeSelectedRecords = {}  # The records selected for each mode.
+    for mode in modes:
+        if mode == "earliest":
+            # Select the earliest association between one of the positive indicator codes and the patient.
 
-    return selectedRecords
+            # First find the code that has the earliest association with the patient. This will return not just
+            # the earliest association, but all associations between the patient and the earliest occurring code.
+            earliestRecord = min(selectedRecords.items(), key=lambda x: x[1][0]["Date"])
+
+            # Determine the code that occurred earliest, and its association with the patient that caused it to be
+            # the earliest occurring code. Due to the way associations are stored (chronologically) the first
+            # association in the record is the earliest.
+            earliestCode = earliestRecord[0]
+            earliestAssociation = earliestRecord[1][0]  # The first (and therefore earliest) association with the code.
+            selectedRecords = {earliestCode: [earliestAssociation]}
+            modeSelectedRecords[mode] = {earliestCode: [earliestAssociation]}
+        elif mode == "latest":
+            # Select the latest association between one of the positive indicator codes and the patient.
+
+            # First find the code that has the latest association with the patient. This will return not just
+            # the latest association, but all associations between the patient and the latest occurring code.
+            latestRecord = max(selectedRecords.items(), key=lambda x: x[1][-1]["Date"])
+
+            # Determine the code that occurred latest, and its association with the patient that caused it to be
+            # the latest occurring code. Due to the way associations are stored (chronologically) the last
+            # association in the record is the latest.
+            latestCode = latestRecord[0]
+            latestAssociation = latestRecord[1][0]  # The last (and therefore latest) association with the code.
+            selectedRecords = {latestCode: [latestAssociation]}
+            modeSelectedRecords[mode] = {latestCode: [latestAssociation]}
+        elif mode == "max":
+            # Select the association between one of the positive indicator codes and the patient that
+            # contains the greatest value.
+            maxRecord = max(selectedRecords.items(), key=lambda x: x[1][0]["Val1"])
+            selectedRecords = {maxRecord[0]: [maxRecord[1][0]]}
+            modeSelectedRecords[mode] = {maxRecord[0]: [maxRecord[1][0]]}
+        elif mode == "min":
+            # Select the association between one of the positive indicator codes and the patient that
+            # contains the smallest value.
+            minRecord = min(selectedRecords.items(), key=lambda x: x[1][0]["Val1"])
+            selectedRecords = {minRecord[0]: [minRecord[1][0]]}
+            modeSelectedRecords[mode] = {minRecord[0]: [minRecord[1][0]]}
+        else:
+            # Selecting all codes.
+            modeSelectedRecords[mode] = dict(selectedRecords)
+
+    return modeSelectedRecords

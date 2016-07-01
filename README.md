@@ -20,7 +20,7 @@ At least one whitespace character is needed as a separator between:
 \> {restriction}
 ^-?[a-zA-Z0-9]{1,5}(\\.*|%)$
 
-{mode} should be one of (case insensitive):
+{mode} should be one or more of the following separated by spaces (case insensitive):
 
 - EARLIEST - Select the earliest positive indicator code for the condition.
 - LAST - Select the most recent positive indicator code for the condition.

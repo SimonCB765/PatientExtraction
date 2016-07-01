@@ -74,27 +74,38 @@ def main(fileInput, fileCodeDescriptions, fileOutput, fileLog, validModeChoices,
                 conditionsFound.append(currentCondition)
 
                 # Initialise the mapping recording mode, output and patient restrictions for this condition.
-                conditionData[currentCondition] = {"Mode": "all",
+                conditionData[currentCondition] = {"Mode": ["all"],
                                                    "Out": ["count"],
                                                    "Restrictions": {"Date": [], "Val1": []}}
             elif line[0] == '>':
                 # Found the start of mode, output or restriction information.
                 fidOutput.write(line)
+                line = re.sub("\s+", ' ', line)  # Turn consecutive whitespace into a single space.
                 controlInfo = line[1:].strip().lower()
 
                 if controlInfo[:4] == "mode":
                     # A line recording the mode to use for the condition was found.
                     chunks = controlInfo.split()
-                    mode = chunks[1]
-                    if mode not in validModeChoices:
-                        # An invalid mode choice was found.
-                        fidLog.write(
-                            "WARNING: Mode {0:s} for condition {1:s} is not recognised. Replacing with mode 'ALL'.\n"
-                                .format(mode, currentCondition))
-                        conditionData[currentCondition]["Mode"] = "all"
+                    modeChoices = [i for i in chunks[1:]]
+                    invalidModeChoices = set(modeChoices).difference(validModeChoices)
+                    if invalidModeChoices:
+                        # An invalid mode was supplied.
+                        remainingModeChoices = set(modeChoices).intersection(validModeChoices)
+
+                        if remainingModeChoices:
+                            # Some of the user's mode choices were valid, so use those.
+                            fidLog.write("WARNING: Invalid modes {0:s} for condition {1:s} have been ignored.\n"
+                                         .format(','.join([str(i) for i in invalidModeChoices]), currentCondition))
+                            conditionData[currentCondition]["Mode"] = remainingModeChoices
+                        else:
+                            # None of the user's mode choices were valid, so default to ALL.
+                            fidLog.write("WARNING: All modes supplied for condition {1:s} are invalid. Defaulting to "
+                                         "using only mode 'ALL'.\n"
+                                         .format(','.join([str(i) for i in invalidModeChoices]), currentCondition))
+                            conditionData[currentCondition]["Mode"] = ["all"]
                     else:
-                        # The mode is valid.
-                        conditionData[currentCondition]["Mode"] = chunks[1]
+                        # There are no invalid mode choices specified.
+                        conditionData[currentCondition]["Mode"] = modeChoices
                 elif controlInfo[:3] == "out":
                     # A line recording the output to use for the condition was found.
                     chunks = controlInfo.split()
