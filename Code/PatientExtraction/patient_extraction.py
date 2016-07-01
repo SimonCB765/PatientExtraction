@@ -167,7 +167,7 @@ def generate_patient_output(patientID, patientRecordSubset, conditions, conditio
                     # If using the given mode managed to collect any associations.
                     for out in conditionData[i]["Out"]:
                         if out == "count":
-                            lengths = map(len, [patientRecordSubset[i][k] for k in patientRecordSubset[i][mode]])
+                            lengths = map(len, [patientRecordSubset[i][mode][k] for k in patientRecordSubset[i][mode]])
                             count = sum(lengths)
                             generatedOutput += "\t{0:d}".format(count)
                         elif out == "max":
