@@ -3,11 +3,15 @@
 # Python imports.
 from collections import defaultdict
 import datetime
+import logging
 import operator
 import re
 
+# Globals.
+LOGGER = logging.getLogger(__name__)
 
-def main(fileInput, fileCodeDescriptions, fileOutput, fileLog, validModeChoices, validOutputChoices):
+
+def main(fileInput, fileCodeDescriptions, fileOutput, validModeChoices, validOutputChoices):
     """
 
     :param fileInput:               The location of the input file containing the case definitions.
@@ -16,8 +20,6 @@ def main(fileInput, fileCodeDescriptions, fileOutput, fileLog, validModeChoices,
     :type fileCodeDescriptions:     str
     :param fileOutput:              The location of the file to write the annotated input file to.
     :type fileOutput:               str
-    :param fileLog:                 The location of the log file.
-    :type fileLog:                  str
     :param validModeChoices:        The valid modes for choosing selecting codes.
     :type validModeChoices:         list
     :param validOutputChoices:      The valid output options for writing out the results of the patient extraction.
@@ -60,7 +62,7 @@ def main(fileInput, fileCodeDescriptions, fileOutput, fileLog, validModeChoices,
     # restrictions on patients having the condition (e.g. date ranges, values, etc.).
     conditionData = {}
     currentCondition = ""  # The condition for which the codes are currently being gathered.
-    with open(fileInput, 'r') as fidInput, open(fileOutput, 'w') as fidOutput, open(fileLog, 'a') as fidLog:
+    with open(fileInput, 'r') as fidInput, open(fileOutput, 'w') as fidOutput:
         for line in fidInput:
             line = line.strip()
             if not line:
@@ -99,14 +101,14 @@ def main(fileInput, fileCodeDescriptions, fileOutput, fileLog, validModeChoices,
 
                         if remainingModeChoices:
                             # Some of the user's mode choices were valid, so use those.
-                            fidLog.write("WARNING: Invalid modes {0:s} for condition {1:s} have been ignored.\n"
-                                         .format(','.join([str(i) for i in invalidModeChoices]), currentCondition))
+                            LOGGER.warning("Invalid modes {0:s} for condition {1:s} have been ignored.\n"
+                                           .format(','.join([str(i) for i in invalidModeChoices]), currentCondition))
                             conditionData[currentCondition]["Mode"] = remainingModeChoices
                         else:
                             # None of the user's mode choices were valid, so default to ALL.
-                            fidLog.write("WARNING: All modes supplied for condition {1:s} are invalid. Defaulting to "
-                                         "using mode 'ALL'.\n"
-                                         .format(','.join([str(i) for i in invalidModeChoices]), currentCondition))
+                            LOGGER.warning("All modes supplied for condition {1:s} are invalid. Defaulting to "
+                                           "using mode 'ALL'.\n"
+                                           .format(','.join([str(i) for i in invalidModeChoices]), currentCondition))
                             conditionData[currentCondition]["Mode"] = ["all"]
                     else:
                         # There are no invalid mode choices specified.
@@ -122,14 +124,14 @@ def main(fileInput, fileCodeDescriptions, fileOutput, fileLog, validModeChoices,
 
                         if remainingOutputChoices:
                             # Some of the user's output choices were valid, so use those.
-                            fidLog.write("WARNING: Invalid outputs {0:s} for condition {1:s} have been ignored.\n"
-                                         .format(','.join([str(i) for i in invalidOutputChoices]), currentCondition))
+                            LOGGER.warning("Invalid outputs {0:s} for condition {1:s} have been ignored.\n"
+                                           .format(','.join([str(i) for i in invalidOutputChoices]), currentCondition))
                             conditionData[currentCondition]["Out"] = remainingOutputChoices
                         else:
                             # None of the user's mode choices were valid, so default to ALL.
-                            fidLog.write("WARNING: All output choices supplied for condition {1:s} are invalid. "
-                                         "Defaulting to using output 'COUNT'.\n"
-                                         .format(','.join([str(i) for i in invalidOutputChoices]), currentCondition))
+                            LOGGER.warning("All output choices supplied for condition {1:s} are invalid. "
+                                           "Defaulting to using output 'COUNT'.\n"
+                                           .format(','.join([str(i) for i in invalidOutputChoices]), currentCondition))
                             conditionData[currentCondition]["Out"] = ["count"]
                     else:
                         # There are no invalid output choices specified.
@@ -142,8 +144,8 @@ def main(fileInput, fileCodeDescriptions, fileOutput, fileLog, validModeChoices,
                         startDate = datetime.datetime.strptime(chunks[1], "%Y-%m-%d")
                         endDate = datetime.datetime.strptime(chunks[3], "%Y-%m-%d")
                         if endDate < startDate:
-                            fidLog.write(
-                                "WARNING: End date before start date for condition {0:s}'s restriction line \"{1:s}\". "
+                            LOGGER.warning(
+                                "End date before start date for condition {0:s}'s restriction line \"{1:s}\". "
                                 "The restriction has been ignored.\n".format(currentCondition, controlInfo))
                         else:
                             # Create the function to use to perform the restriction.
@@ -153,15 +155,15 @@ def main(fileInput, fileCodeDescriptions, fileOutput, fileLog, validModeChoices,
                         # The restriction involves values.
                         if len(chunks) != 3:
                             # The restriction is not of the correct form.
-                            fidLog.write(
-                                "WARNING: The value restriction \"{0:s}\" for condition {1:s} is not formatted "
+                            LOGGER.warning(
+                                "The value restriction \"{0:s}\" for condition {1:s} is not formatted "
                                 "correctly and has been ignored.\n".format(controlInfo, currentCondition))
                         else:
                             # The restriction has the correct number of parts.
                             if chunks[1] not in ['<', "<=", '>', ">="]:
                                 # The operator is missing.
-                                fidLog.write(
-                                    "WARNING: The value restriction \"{0:s}\" for condition {1:s} should have one of "
+                                LOGGER.warning(
+                                    "The value restriction \"{0:s}\" for condition {1:s} should have one of "
                                     "<, <=, > or >= as the 2nd element. The restriction has been ignored.\n"
                                         .format(controlInfo, currentCondition))
                             try:
@@ -178,14 +180,14 @@ def main(fileInput, fileCodeDescriptions, fileOutput, fileLog, validModeChoices,
                                 conditionData[currentCondition]["Restrictions"]["Val1"].append(comparisonFunc)
                             except ValueError:
                                 # The value supplied could not be converted to a float.
-                                fidLog.write(
-                                    "WARNING: The value restriction \"{0:s}\" for condition {1:s} should have a number "
+                                LOGGER.warning(
+                                    "The value restriction \"{0:s}\" for condition {1:s} should have a number "
                                     "as the 3rd element. The restriction has been ignored.\n"
                                         .format(controlInfo, currentCondition))
                     else:
                         # The restriction is not recognised.
-                        fidLog.write(
-                            "WARNING: The mode, output or restriction line \"{0:s}\" for condition {1:s} was not "
+                        LOGGER.warning(
+                            "The mode, output or restriction line \"{0:s}\" for condition {1:s} was not "
                             "recognised and has been ignored.\n".format(controlInfo, currentCondition))
             else:
                 # Found a code for the current condition.
@@ -222,6 +224,6 @@ def main(fileInput, fileCodeDescriptions, fileOutput, fileLog, validModeChoices,
                     else:
                         # The code has no known description.
                         fidOutput.write("{0:s}{1:.<5}\tCode not recognised\n".format(negationIndicator, i))
-                        fidLog.write("WARNING: Code {0:s} was not found in the dictionary.\n".format(i))
+                        LOGGER.warning("Code {0:s} was not found in the dictionary.\n".format(i))
 
     return mapConditionToCode, conditionData, conditionsFound

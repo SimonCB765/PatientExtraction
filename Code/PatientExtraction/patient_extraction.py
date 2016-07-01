@@ -5,69 +5,28 @@ import datetime
 import json
 import operator
 import os
-import sys
 
 # User imports.
 from . import conditon_code_mappings
-from Utilities import json_to_ascii
 
 # Globals.
-PYVERSION = sys.version_info[0]  # Determine major version number.
 VALIDMODECHOICES = ["earliest", "latest", "all", "max", "min"]  # Initialise the valid code selection modes.
 VALIDOUTPUTCHOICES = {"code", "count", "date", "max", "mean", "min", "value"}  # Initialise the valid output options.
 
 
-def main(fileInput, dirOutput, fileConfig):
+def main(fileInput, dirOutput, filePatientData, fileCodeDescriptions):
     """Run the patient extraction.
 
-    :param fileInput:   The location of the input file containing the case definitions.
-    :type fileInput:    str
-    :param dirOutput:   The location of the directory to write the program output to.
-    :type dirOutput:    str
-    :param fileConfig:  The location of the configuration file.
-    :type fileConfig:   str
+    :param fileInput:               The location of the input file containing the case definitions.
+    :type fileInput:                str
+    :param dirOutput:               The location of the directory to write the program output to.
+    :type dirOutput:                str
+    :param filePatientData:         The location of the file containing the patient data.
+    :type filePatientData:          str
+    :param fileCodeDescriptions:    The location of the file containing the mapping from codes to their descriptions.
+    :type fileCodeDescriptions:     str
 
     """
-
-    #---------------------------------------------#
-    # Parse and Validate Configuration Parameters #
-    #---------------------------------------------#
-    errorsFound = []
-
-    # Parse the JSON file of parameters.
-    readParams = open(fileConfig, 'r')
-    parsedArgs = json.load(readParams)
-    if PYVERSION == 2:
-        parsedArgs = json_to_ascii.json_to_ascii(parsedArgs)  # Convert all unicode characters to ascii for Python < v3.
-    readParams.close()
-
-    # Check that the flat file input directory parameter is correct.
-    if "FlatFileDirectory" not in parsedArgs:
-        errorsFound.append("There must be a parameter field called FlatFileDirectory.")
-    elif not os.path.isdir(parsedArgs["FlatFileDirectory"]):
-        errorsFound.append("The input data directory does not exist.")
-
-    # Check that the file containing the mapping from codes to descriptions is present.
-    if "CodeDescriptionFile" not in parsedArgs:
-        errorsFound.append("There must be a parameter field called CodeDescriptionFile.")
-    elif not os.path.isfile(parsedArgs["CodeDescriptionFile"]):
-        errorsFound.append("The file of code to description mappings does not exist.")
-
-    # Print error messages.
-    if errorsFound:
-        print("\n\nThe following errors were encountered while parsing the input parameters:\n")
-        print('\n'.join(errorsFound))
-        sys.exit()
-
-    # Extract parameters.
-    dirFlatFiles = parsedArgs["FlatFileDirectory"]
-    fileCodeDescriptions = parsedArgs["CodeDescriptionFile"]
-
-    # Setup the log file.
-    fileLog = os.path.join(dirOutput, "PatientExtraction.log")
-
-    # Setup the flat file representation files.
-    filePatientData = os.path.join(dirFlatFiles, "PatientData.tsv")
 
     #-------------------------------------------------#
     # Determine Mappings Between Conditions and Codes #
@@ -80,7 +39,7 @@ def main(fileInput, dirOutput, fileConfig):
 
     # Generate the mapping.
     mapConditionToCode, conditionData, conditionsFound = conditon_code_mappings.main(
-        fileInput, fileCodeDescriptions, fileAnnotatedInput, fileLog, VALIDMODECHOICES, VALIDOUTPUTCHOICES)
+        fileInput, fileCodeDescriptions, fileAnnotatedInput, VALIDMODECHOICES, VALIDOUTPUTCHOICES)
 
     #---------------------------------------------------#
     # Select and Output the Desired Patient Information #
