@@ -100,7 +100,7 @@ def main(fileInput, fileCodeDescriptions, fileOutput, fileLog, validModeChoices,
                         else:
                             # None of the user's mode choices were valid, so default to ALL.
                             fidLog.write("WARNING: All modes supplied for condition {1:s} are invalid. Defaulting to "
-                                         "using only mode 'ALL'.\n"
+                                         "using mode 'ALL'.\n"
                                          .format(','.join([str(i) for i in invalidModeChoices]), currentCondition))
                             conditionData[currentCondition]["Mode"] = ["all"]
                     else:
@@ -113,11 +113,19 @@ def main(fileInput, fileCodeDescriptions, fileOutput, fileLog, validModeChoices,
                     invalidOutputChoices = set(outChoices).difference(validOutputChoices)
                     if invalidOutputChoices:
                         # An invalid output choice was supplied.
-                        fidLog.write(
-                            "WARNING: Invalid output choice(s) {0:s} for condition {1:s} were not recognised and have "
-                            "been ignored.\n"
-                                .format(','.join([str(i) for i in invalidOutputChoices]), currentCondition))
-                        conditionData[currentCondition]["Out"] = set(outChoices).intersection(validOutputChoices)
+                        remainingOutputChoices = set(outChoices).intersection(validOutputChoices)
+
+                        if remainingOutputChoices:
+                            # Some of the user's output choices were valid, so use those.
+                            fidLog.write("WARNING: Invalid outputs {0:s} for condition {1:s} have been ignored.\n"
+                                         .format(','.join([str(i) for i in invalidOutputChoices]), currentCondition))
+                            conditionData[currentCondition]["Out"] = remainingOutputChoices
+                        else:
+                            # None of the user's mode choices were valid, so default to ALL.
+                            fidLog.write("WARNING: All output choices supplied for condition {1:s} are invalid. "
+                                         "Defaulting to using output 'COUNT'.\n"
+                                         .format(','.join([str(i) for i in invalidOutputChoices]), currentCondition))
+                            conditionData[currentCondition]["Out"] = ["count"]
                     else:
                         # There are no invalid output choices specified.
                         conditionData[currentCondition]["Out"] = outChoices
