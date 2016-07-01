@@ -7,7 +7,16 @@ import os
 import sys
 
 # User imports.
-from . import patient_extraction
+if __package__ == "PatientExtraction":
+    # If the package is PatientExtraction, then relative imports are needed.
+    from . import patient_extraction
+else:
+    # The code was not called from within the Code directory using 'python -m PatientExtraction'.
+    # Therefore, we need to add the top level Code directory to the search path and use absolute imports.
+    currentDir = os.path.dirname(os.path.join(os.getcwd(), __file__))  # Directory containing this file.
+    codeDir = os.path.abspath(os.path.join(currentDir, os.pardir))
+    sys.path.append(codeDir)
+    from PatientExtraction import patient_extraction
 
 
 #------------------------#

@@ -5,7 +5,16 @@ import os
 import sys
 
 # User imports.
-from . import generate_flat_files
+if __package__ == "GenerateDataFiles":
+    # If the package is GenerateDataFiles, then relative imports are needed.
+    from . import generate_flat_files
+else:
+    # The code was not called from within the Code directory using 'python -m GenerateDataFiles'.
+    # Therefore, we need to add the top level Code directory to the search path and use absolute imports.
+    currentDir = os.path.dirname(os.path.join(os.getcwd(), __file__))  # Directory containing this file.
+    codeDir = os.path.abspath(os.path.join(currentDir, os.pardir))
+    sys.path.append(codeDir)
+    from GenerateDataFiles import generate_flat_files
 
 
 # Determine the default configuration file to use.
