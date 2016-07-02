@@ -9,7 +9,6 @@ import os
 import sys
 
 # User imports.
-from Utilities import json_to_ascii
 if __package__ == "PatientExtraction":
     # If the package is PatientExtraction, then relative imports are needed.
     from . import patient_extraction
@@ -20,6 +19,7 @@ else:
     codeDir = os.path.abspath(os.path.join(currentDir, os.pardir))
     sys.path.append(codeDir)
     from PatientExtraction import patient_extraction
+from Utilities import json_to_ascii
 
 # Globals.
 PYVERSION = sys.version_info[0]  # Determine major version number.
