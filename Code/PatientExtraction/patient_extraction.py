@@ -221,6 +221,11 @@ def select_associations(medicalRecord, patientPosCondCodes, conditionRestriction
     # remove all codes that now contain no associations in the selected records).
     selectedRecords = {i: selectedRecords[i] for i in selectedRecords if selectedRecords[i]}
 
+    if not selectedRecords:
+        # If there are no records with positive indicator codes that meet the restriction criteria, then return empty
+        # dictionaries for each mode.
+        return {i: {} for i in modes}
+
     modeSelectedRecords = {}  # The records selected for each mode.
     for mode in modes:
         if mode == "earliest":
