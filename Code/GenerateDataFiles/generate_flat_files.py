@@ -5,81 +5,24 @@ import collections
 import datetime
 import json
 import operator
-import os
-import sys
-
-# User imports.
-from Utilities import json_to_ascii
-
-# Globals.
-PYVERSION = sys.version_info[0]  # Determine major version number.
 
 
-def main(fileConfig):
+def main(filePatients, fileOutput):
     """Generate the flat files to use for the patient extraction.
 
     The SQL file that the data is read from is assumed to have all patient entries listed consecutively.
 
-    :param fileConfig:   The location of the file containing the flat file generation arguments in JSON format.
-    :type fileConfig:    str
+    :param filePatients:    The location of the patient data file (in SQL insert format).
+    :type filePatients:     str
+    :param fileOutput:      The location of the file where the patient data should be saved.
+    :type fileOutput:       str
 
     """
 
-    #---------------------------------------------#
-    # Parse and Validate Configuration Parameters #
-    #---------------------------------------------#
-    errorsFound = []
-
-    # Parse the JSON file of parameters.
-    readParams = open(fileConfig, 'r')
-    parsedArgs = json.load(readParams)
-    if PYVERSION == 2:
-        parsedArgs = json_to_ascii.json_to_ascii(parsedArgs)  # Convert all unicode characters to ascii for Python < v3.
-    readParams.close()
-
-    # Check the input directory parameter is correct.
-    if "SQLDataDirectory" not in parsedArgs:
-        errorsFound.append("There must be a parameter field called SQLDataDirectory.")
-    elif not os.path.isdir(parsedArgs["SQLDataDirectory"]):
-        errorsFound.append("The input data directory does not exist.")
-
-    # Check the output directory parameter is correct.
-    if "FlatFileDirectory" not in parsedArgs:
-        errorsFound.append("There must be a parameter field called FlatFileDirectory.")
-    try:
-        os.makedirs(parsedArgs["FlatFileDirectory"])
-    except FileExistsError:
-        # Directory already exists.
-        pass
-
-    # Print error messages.
-    if errorsFound:
-        print("\n\nThe following errors were encountered while parsing the input parameters:\n")
-        print('\n'.join(errorsFound))
-        sys.exit()
-
-    # Extract parameters.
-    dirSQLFiles = parsedArgs["SQLDataDirectory"]
-    dirOutput = parsedArgs["FlatFileDirectory"]
-
-    # Get the files for the SQL table we're interested in the journal table).
-    fileJournalTable = os.path.join(dirSQLFiles, "journal.sql")
-
-    # Setup the output file for the patient data.
-    filePatientData = os.path.join(dirOutput, "PatientData.tsv")
-    try:
-        os.remove(filePatientData)
-    except FileNotFoundError:
-        # The file does not exist so no need to do anything.
-        pass
-
-    #----------------------------------#
-    # Extract Data from the SQL Files  #
-    #----------------------------------#
     currentPatient = None  # The ID of the patient who's record is currently being built.
     patientData = collections.defaultdict(list)  # The data for the current patient.
-    with open(fileJournalTable, 'r') as fidJournalTable:
-        for line in fidJournalTable:
+    with open(filePatients, 'r') as fidPatients:
+        for line in fidPatients:
             if line[:6] == "insert":
                 # The line contains information about a row in the journal table.
                 line = line[75:]  # Strip of the SQL insert syntax at the beginning.
@@ -119,7 +62,7 @@ def main(fileConfig):
 
                 if patientID != currentPatient and currentPatient:
                     # A new patient has been found and this is not the first line of the file.
-                    save_patient(currentPatient, patientData, filePatientData)  # Record the old patient's data.
+                    save_patient(currentPatient, patientData, fileOutput)  # Record the old patient's data.
                     patientData = collections.defaultdict(list)  # Clear the patient data.
 
                 # Update the patient's data.
@@ -127,10 +70,10 @@ def main(fileConfig):
                 patientData[code].append({"Date": date, "Val1": value1, "Val2": value2, "Text": freeText})
 
     # Record the final patient's data.
-    save_patient(currentPatient, patientData, filePatientData)
+    save_patient(currentPatient, patientData, fileOutput)
 
 
-def save_patient(patientID, patientData, filePatientData):
+def save_patient(patientID, patientData, fileOutput):
     """Save a single patient's medical history in JSON format on a single line.
 
     :param patientID:           The ID of the patient
@@ -138,8 +81,8 @@ def save_patient(patientID, patientData, filePatientData):
     :param patientData:         The patient's medical history. Each entry is a dictionary with the format:
                                     {"Date": date, "Val1": value1, "Val2": value2, "Text": freeText}
     :type patientData:          dict
-    :param filePatientData:     The location of the file to save the patient's data to.
-    :type filePatientData:      str
+    :param fileOutput:          The location of the file to save the patient's data to.
+    :type fileOutput:           str
 
     """
 
@@ -154,5 +97,5 @@ def save_patient(patientID, patientData, filePatientData):
             j["Date"] = j["Date"].strftime("%Y-%m-%d")
 
     # Output the current patient's data.
-    with open(filePatientData, 'a') as fidPatientData:
-        fidPatientData.write("{0:s}\t{1:s}\n".format(patientID, json.dumps(patientData)))
+    with open(fileOutput, 'a') as fidOutput:
+        fidOutput.write("{0:s}\t{1:s}\n".format(patientID, json.dumps(patientData)))
