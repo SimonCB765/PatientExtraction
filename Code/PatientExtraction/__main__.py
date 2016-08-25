@@ -20,6 +20,11 @@ else:
     sys.path.append(codeDir)
     from PatientExtraction import patient_extraction
 
+# Globals.
+VALIDMODECHOICES = ["earliest", "latest", "all", "max", "min"]  # Initialise the valid code selection modes.
+VALIDOUTPUTCHOICES = {"code", "count", "date", "max", "mean", "min", "value"}  # Initialise the valid output options.
+VALIDCHOICES = {"Mode": VALIDMODECHOICES, "Output": VALIDOUTPUTCHOICES}
+
 
 # ====================== #
 # Create Argument Parser #
@@ -135,4 +140,4 @@ logger.addHandler(logConsoleHandler)
 # Perform the Patient Extraction #
 # ============================== #
 logger.info("Starting patient extraction.")
-patient_extraction.main(fileInput, dirOutput, filePatientData, fileCodeDescriptions)
+patient_extraction.main(fileInput, dirOutput, filePatientData, fileCodeDescriptions, VALIDCHOICES)
