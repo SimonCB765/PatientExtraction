@@ -20,7 +20,7 @@ def main(fileInput, fileCodeDescriptions, fileOutput, validModeChoices, validOut
     :type fileCodeDescriptions:     str
     :param fileOutput:              The location of the file to write the annotated input file to.
     :type fileOutput:               str
-    :param validModeChoices:        The valid modes for choosing selecting codes.
+    :param validModeChoices:        The valid modes for selecting codes.
     :type validModeChoices:         list
     :param validOutputChoices:      The valid output options for writing out the results of the patient extraction.
     :type validOutputChoices:       set
@@ -29,22 +29,22 @@ def main(fileInput, fileCodeDescriptions, fileOutput, validModeChoices, validOut
                                         containing two sets:
                                         "Positive" - the codes that are positive indicators for the condition
                                         "Negative" - the codes that are negative indicators for the condition
-                                    2) A mapping from conditions to information about the mde, output and restrictions
+                                    2) A mapping from conditions to information about the mode, output and restrictions
                                         to be used when finding patients with the condition. The three entries for each
                                         condition are:
                                         "Mode" - a string indicating the patient's codes that should be selected
                                         "Out" - a list of strings indicating what should be output about the patient
                                         "Restrictions" - a list of restrictions on which patients should be deemed to
                                             have the condition
-                                    3) The conditions that the user has requested patients data for in the order that
+                                    3) The conditions that the user has requested patient data for in the order that
                                         they appear in the input file.
     :rtype:                         dict, dict, list
 
     """
 
-    #--------------------------------------#
+    # ==================================== #
     # Load the Code to Description Mapping #
-    #--------------------------------------#
+    # ==================================== #
     mapCodeToDescription = {}
     with open(fileCodeDescriptions, 'r') as fidCodeDescriptions:
         for line in fidCodeDescriptions:
@@ -52,9 +52,9 @@ def main(fileInput, fileCodeDescriptions, fileOutput, validModeChoices, validOut
             chunks = line.split('\t')
             mapCodeToDescription[chunks[0]] = chunks[1]
 
-    #--------------------------------------------------------------#
+    # ============================================================ #
     # Generate Code Condition Mappings and Annotate the Input File #
-    #--------------------------------------------------------------#
+    # ============================================================ #
     conditionsFound = []  # List of the conditions the user requested patient data for.
     # Create the mapping from conditions to the codes that are positive and negative indicators of it.
     mapConditionToCode = defaultdict(lambda: {"Positive": set(), "Negative": set()})
@@ -170,6 +170,7 @@ def main(fileInput, fileCodeDescriptions, fileOutput, validModeChoices, validOut
                                 value = float(chunks[2])
                                 comparisonFunc = None  # The function to use to perform the restriction.
                                 if chunks[1] == '<':
+                                    # def comparisonFunc(x): return operator.lt(x, value)
                                     comparisonFunc = lambda x: operator.lt(x, value)
                                 elif chunks[1] == "<=":
                                     comparisonFunc = lambda x: operator.le(x, value)

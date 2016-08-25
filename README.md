@@ -1,8 +1,8 @@
 # PatientExtraction
 
 ## Input File Format
-if the exact same condition name is used more than once, then the last one takes precendence
-    all information from previous occurences are removed
+if the exact same condition name is used more than once, then the last one takes precedence
+    all information from previous occurrences are removed
 Codes ending in % are expanded to contain all child codes
 Codes can have no full stops (e.g. 101) or full stops (e.g. 101..)
 Can't combine full stops and %
@@ -24,11 +24,11 @@ At least one whitespace character is needed as a separator between:
 
 {mode} should be one or more of the following separated by spaces (case insensitive):
 
-- EARLIEST - Select the earliest positive indicator code for the condition.
-- LAST - Select the most recent positive indicator code for the condition.
-- ALL - (Default value) Select all positive indicator codes for the condition.
-- MAX - Select the positive indicator code with the greatest associated value (value 1 (v) not value 2 (w)).
-- MIN - Select the positive indicator code with the smallest associated value (value 1 (v) not value 2 (w)).
+- EARLIEST - Select the earliest non-negative indicator code for the condition.
+- LAST - Select the most recent non-negative indicator code for the condition.
+- ALL - (Default value) Select all non-negative indicator codes for the condition.
+- MAX - Select the non-negative indicator code with the greatest associated value (value 1 (v) not value 2 (w)).
+- MIN - Select the non-negative indicator code with the smallest associated value (value 1 (v) not value 2 (w)).
 
 {out} should be one or more of the following separated by spaces (case insensitive):
 
@@ -60,7 +60,7 @@ Examples of valid codes:
 Config file needs to contain the following fields:
 
 - SQLDataDirectory - The directory where the SQL dumps are.
-- FlatFileDirectory - The directory where the flat file represeation of the SQL data should be recorded.
+- FlatFileDirectory - The directory where the flat file representation of the SQL data should be recorded.
 
 ## Patient Extraction
 Config file needs to contain the following fields:

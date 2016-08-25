@@ -110,7 +110,7 @@ _selector = {"all": _all_selector,
              "min": _min_selector}
 
 
-def select_associations(medicalRecord, patientPosCondCodes, conditionRestrictions, modes=("all")):
+def select_associations(medicalRecord, patientPosCondCodes, conditionRestrictions, modes=("all",)):
     """Select information about the associations between a patient and their codes according to a mode and restrictions.
 
     :param medicalRecord:           A patient's medical record.
