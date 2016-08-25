@@ -5,13 +5,14 @@ import os
 
 # User imports.
 from . import annotate_case_definitions
+from . import parse_conditions
 
 
-def main(fileInput, dirOutput, filePatientData, fileCodeDescriptions, validChoices):
+def main(fileCaseDefs, dirOutput, filePatientData, fileCodeDescriptions, validChoices):
     """Run the patient extraction.
 
-    :param fileInput:               The location of the input file containing the case definitions.
-    :type fileInput:                str
+    :param fileCaseDefs:            The location of the input file containing the case definitions.
+    :type fileCaseDefs:             str
     :param dirOutput:               The location of the directory to write the program output to.
     :type dirOutput:                str
     :param filePatientData:         The location of the file containing the patient data.
@@ -24,7 +25,10 @@ def main(fileInput, dirOutput, filePatientData, fileCodeDescriptions, validChoic
     """
 
     # Create a version of the input file with expanded codes and added code descriptions.
-    fileAnnotatedInput = os.path.split(fileInput)[1]
-    fileAnnotatedInput = fileAnnotatedInput.split('.')[0] + "_Annotated." + fileAnnotatedInput.split('.')[1]
-    fileAnnotatedInput = os.path.join(dirOutput, fileAnnotatedInput)
-    annotate_case_definitions.main(fileInput, fileCodeDescriptions, fileAnnotatedInput)
+    fileAnnotatedCaseDefs = os.path.split(fileCaseDefs)[1]
+    fileAnnotatedCaseDefs = fileAnnotatedCaseDefs.split('.')[0] + "_Annotated." + fileAnnotatedCaseDefs.split('.')[1]
+    fileAnnotatedCaseDefs = os.path.join(dirOutput, fileAnnotatedCaseDefs)
+    annotate_case_definitions.main(fileCaseDefs, fileCodeDescriptions, fileAnnotatedCaseDefs)
+
+    # Extract the case definitions from the file of case definitions.
+    caseDefintions, caseNames = parse_conditions.main(fileAnnotatedCaseDefs, validChoices)
