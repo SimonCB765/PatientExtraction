@@ -131,14 +131,15 @@ def main(fileConfig):
 
 
 def save_patient(patientID, patientData, filePatientData):
-    """
+    """Save a single patient's medical history in JSON format on a single line.
 
-    :param patientID:
-    :type patientID:
-    :param patientData:
-    :type patientData:
-    :param filePatientData:
-    :type filePatientData:
+    :param patientID:           The ID of the patient
+    :type patientID:            str
+    :param patientData:         The patient's medical history. Each entry is a dictionary with the format:
+                                    {"Date": date, "Val1": value1, "Val2": value2, "Text": freeText}
+    :type patientData:          dict
+    :param filePatientData:     The location of the file to save the patient's data to.
+    :type filePatientData:      str
 
     """
 
