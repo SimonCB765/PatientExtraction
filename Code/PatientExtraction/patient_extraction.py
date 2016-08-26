@@ -19,7 +19,7 @@ def main(fileCaseDefs, dirOutput, filePatientData, fileCodeDescriptions, validCh
     :type filePatientData:          str
     :param fileCodeDescriptions:    The location of the file containing the mapping from codes to their descriptions.
     :type fileCodeDescriptions:     str
-    :param validChoices:            The valid mode and output flags that can appear in the case definition file.
+    :param validChoices:            The valid modes, outputs and operators that can appear in the case definition file.
     :type validChoices:             dict
 
     """
@@ -28,7 +28,7 @@ def main(fileCaseDefs, dirOutput, filePatientData, fileCodeDescriptions, validCh
     fileAnnotatedCaseDefs = os.path.split(fileCaseDefs)[1]
     fileAnnotatedCaseDefs = fileAnnotatedCaseDefs.split('.')[0] + "_Annotated." + fileAnnotatedCaseDefs.split('.')[1]
     fileAnnotatedCaseDefs = os.path.join(dirOutput, fileAnnotatedCaseDefs)
-    annotate_case_definitions.main(fileCaseDefs, fileCodeDescriptions, fileAnnotatedCaseDefs)
+    annotate_case_definitions.main(fileCaseDefs, fileCodeDescriptions, fileAnnotatedCaseDefs, validChoices)
 
     # Extract the case definitions from the file of case definitions.
-    caseDefintions, caseNames = parse_conditions.main(fileAnnotatedCaseDefs, validChoices)
+    caseDefintions, caseNames = parse_conditions.main(fileAnnotatedCaseDefs)
