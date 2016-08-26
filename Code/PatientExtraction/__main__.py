@@ -13,7 +13,6 @@ import sys
 if __package__ == "PatientExtraction":
     # If the package is PatientExtraction, then relative imports are needed.
     from . import patient_extraction
-    from . import restriction_comparator_generators
 else:
     # The code was not called from within the Code directory using 'python -m PatientExtraction'.
     # Therefore, we need to add the top level Code directory to the search path and use absolute imports.
@@ -21,7 +20,6 @@ else:
     codeDir = os.path.abspath(os.path.join(currentDir, os.pardir))
     sys.path.append(codeDir)
     from PatientExtraction import patient_extraction
-    from PatientExtraction import restriction_comparator_generators
 
 
 # ====================== #
@@ -29,7 +27,9 @@ else:
 # ====================== #
 parser = argparse.ArgumentParser(description="Extract patients meeting user-defined case definitions.",
                                  epilog="For additional information on the expected format and contents of the input "
-                                        "and output files please see the README.")
+                                        "and output files please see the README. If the output of the program is not "
+                                        "as expected, then examine the log file in the results directory used to "
+                                        "determine where case definition errors might have occurred.")
 
 # Mandatory arguments.
 parser.add_argument("input", help="The location of the file containing the case definitions.", type=str)
