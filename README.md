@@ -44,9 +44,11 @@ Each {restriction} line should contain one of (case insensitive):
 
 - A date range in the form - from YYYY-MM-DD to YYYY-MM-DD
     - This will select patients between the two dates (inclusively)
-    - The second date must be more recent than the first one
+    - The second date must be more recent than the first one (or absent to extract all information up to the present)
 - A value range meeting the following criteria:
-    - The expression is of the form: x OP value
+    - The expression is of the form
+        - x OP value
+        - value OP x OP value
     - x is a numeric value
     - OP can be one of <, <=, > or >=
 

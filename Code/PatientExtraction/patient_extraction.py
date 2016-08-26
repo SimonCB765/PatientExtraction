@@ -31,4 +31,4 @@ def main(fileCaseDefs, dirOutput, filePatientData, fileCodeDescriptions, validCh
     annotate_case_definitions.main(fileCaseDefs, fileCodeDescriptions, fileAnnotatedCaseDefs, validChoices)
 
     # Extract the case definitions from the file of case definitions.
-    caseDefintions, caseNames = parse_conditions.main(fileAnnotatedCaseDefs)
+    caseDefintions, caseNames = parse_conditions.main(fileAnnotatedCaseDefs, validChoices)

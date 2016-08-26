@@ -4,6 +4,7 @@
 import argparse
 import datetime
 import logging
+import operator
 import os
 import shutil
 import sys
@@ -12,6 +13,7 @@ import sys
 if __package__ == "PatientExtraction":
     # If the package is PatientExtraction, then relative imports are needed.
     from . import patient_extraction
+    from . import restriction_comparator_generators
 else:
     # The code was not called from within the Code directory using 'python -m PatientExtraction'.
     # Therefore, we need to add the top level Code directory to the search path and use absolute imports.
@@ -19,6 +21,7 @@ else:
     codeDir = os.path.abspath(os.path.join(currentDir, os.pardir))
     sys.path.append(codeDir)
     from PatientExtraction import patient_extraction
+    from PatientExtraction import restriction_comparator_generators
 
 
 # ====================== #
@@ -137,6 +140,7 @@ logger.addHandler(logConsoleHandler)
 logger.info("Starting patient extraction.")
 validModes = ["earliest", "latest", "all", "max", "min"]  # The valid code selection modes.
 validOutputs = {"code", "count", "date", "max", "mean", "min", "value"}  # The valid output options.
-validOperators = {'>', ">=", '<', "<="}  # The valid value restriction operators.
+validOperators = {'>': operator.lt, ">=": operator.le,
+                  '<': operator.gt, "<=": operator.ge}  # The valid value restriction operators.
 validChoices = {"Modes": validModes, "Operators": validOperators, "Outputs": validOutputs}
 patient_extraction.main(fileInput, dirOutput, filePatientData, fileCodeDescriptions, validChoices)
