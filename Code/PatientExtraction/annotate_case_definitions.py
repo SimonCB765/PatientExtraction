@@ -126,10 +126,15 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, validCh
                         else:
                             try:
                                 # Attempt to parse the second and fourth arguments as dates.
-                                datetime.datetime.strptime(chunks[1], "%Y-%m-%d")
-                                datetime.datetime.strptime(chunks[3], "%Y-%m-%d")
-                                # The line is formatted correctly, and so can be written out.
-                                fidAnnotateDefinitions.write(">{:s}\n".format(line))
+                                startDate = datetime.datetime.strptime(chunks[1], "%Y-%m-%d")
+                                endDate = datetime.datetime.strptime(chunks[3], "%Y-%m-%d")
+                                if endDate < startDate:
+                                    # The end date of the date restriction is before the start date.
+                                    LOGGER.warning("Line {:d} date restriction has an end date '{:s}' before its "
+                                                   "start date '{:s}'.".format(lineNum + 1, chunks[1], chunks[3]))
+                                else:
+                                    # The line is formatted correctly and has valid dates.
+                                    fidAnnotateDefinitions.write(">{:s}\n".format(line))
                             except ValueError:
                                 # The line is incorrectly formatted as the second or fourth argument failed to be
                                 # parsed as a date.
