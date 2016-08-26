@@ -178,7 +178,14 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, validCh
                                 formatError = True
                         if not formatError:
                             # The line is correctly formatted, so write it out.
-                            fidAnnotateDefinitions.write(">{:s}\n".format(line))
+                            if len(chunks) == 5:
+                                # If the restriction is a five argument restriction, then split it into two three
+                                # argument ones.
+                                fidAnnotateDefinitions.write(">{:s}\n".format(' '.join(chunks[:3])))
+                                fidAnnotateDefinitions.write(">{:s}\n".format(' '.join(chunks[2:])))
+                            else:
+                                # Just write out a three argument restriction.
+                                fidAnnotateDefinitions.write(">{:s}\n".format(line))
                     else:
                         # There is an incorrect number of arguments on the line.
                         LOGGER.warning("Line {:d} contains {:d} values but value restrictions starting with a "
