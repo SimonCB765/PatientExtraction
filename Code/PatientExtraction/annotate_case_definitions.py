@@ -59,8 +59,8 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions):
             elif line[0] == '>':
                 # The line contains case definition mode, output or restriction information.
                 line = re.sub("\s+", ' ', line)  # Turn consecutive whitespace into a single space.
-                line = line.lower()  # Make everything lowercase.
-                fidAnnotateDefinitions.write("{:s}\n".format(line))
+                line = (line[1:].strip()).lower()  # Make everything lowercase.
+                fidAnnotateDefinitions.write(">{:s}\n".format(line))
             else:
                 # The line contains a code for a condition
                 code = line.strip().replace('.', '')
