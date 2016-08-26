@@ -35,7 +35,7 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions):
     # ============================= #
     currentConditionCodes = {"Negative": set([]), "Positive": set([])}
     with open(fileDefinitions, 'r') as fidDefinitions, open(fileAnnotateDefinitions, 'w') as fidAnnotateDefinitions:
-        for line in fidDefinitions:
+        for lineNum, line in enumerate(fidDefinitions):
             line = line.strip()
             if not line:
                 # The line is empty.
@@ -61,7 +61,7 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions):
                 line = re.sub("\s+", ' ', line)  # Turn consecutive whitespace into a single space.
                 line = (line[1:].strip()).lower()  # Make everything lowercase.
                 fidAnnotateDefinitions.write(">{:s}\n".format(line))
-            else:
+            elif line[0] == '-' or line[0:].isalnum():
                 # The line contains a code for a condition
                 code = line.strip().replace('.', '')
 
@@ -84,6 +84,9 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions):
                 # Add the codes to the list of codes for this condition.
                 for i in codeList:
                     currentConditionCodes[codeType].add(i)
+            else:
+                # The line does not appear to contain valid information, so log this and skip it.
+                LOGGER.warning("Line {:d} contains a non-blank line that could not be processed.".format(lineNum + 1))
 
         # Write out the codes that make up the final case definition.
         for i, j in currentConditionCodes.items():
