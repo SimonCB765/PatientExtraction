@@ -33,6 +33,7 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions):
     # ============================= #
     # Annotate the Case Definitions #
     # ============================= #
+    codeMatcher = re.compile("^-?[a-zA-Z0-9]+\.*%?$")  # Regular expression to identify correctly formatted codes.
     currentConditionCodes = {"Negative": set([]), "Positive": set([])}
     with open(fileDefinitions, 'r') as fidDefinitions, open(fileAnnotateDefinitions, 'w') as fidAnnotateDefinitions:
         for lineNum, line in enumerate(fidDefinitions):
@@ -61,9 +62,9 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions):
                 line = re.sub("\s+", ' ', line)  # Turn consecutive whitespace into a single space.
                 line = (line[1:].strip()).lower()  # Make everything lowercase.
                 fidAnnotateDefinitions.write(">{:s}\n".format(line))
-            elif line[0] == '-' or line[0:].isalnum():
+            elif codeMatcher.match(line):
                 # The line contains a code for a condition
-                code = line.strip().replace('.', '')
+                code = line.replace('.', '')
 
                 # Determine if the code is a negated code.
                 codeType = "Positive"
