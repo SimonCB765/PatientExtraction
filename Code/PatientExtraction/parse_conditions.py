@@ -48,7 +48,7 @@ def main(fileCaseDefs, validChoices):
 
     # Define the variable needed for parsing.
     caseDefinitions = defaultdict(  # The mapping containing the case definitions in easily accessible format.
-        lambda: {"Codes": set(), "Modes": set(), "Outputs": set(), "Restrictions": {"Date": [], "v1": [], "v2": []}}
+        lambda: {"Codes": set(), "Modes": set(), "Outputs": set(), "Restrictions": {"Date": [], "Val1": [], "Val2": []}}
     )
     caseDefsOrder = []  # The case definitions in the order they appear in the user's input file.
     currentCaseDef = ""  # The current case definition being parsed.
@@ -93,8 +93,8 @@ def main(fileCaseDefs, validChoices):
                         float(chunks[0]), validChoices["Operators"][chunks[1]]
                     )
                     caseDefinitions[currentCaseDef]["Restrictions"][chunks[2]].append(comparisonFunc)
-                elif chunks[0] in ["v1", "v2"]:
-                    # Found a line recording a value-based restriction starting with v1 or v2.
+                elif chunks[0] in ["Val1", "Val2"]:
+                    # Found a line recording a value-based restriction starting with Val1 or Val2.
                     comparisonFunc = restriction_comparator_generators.value_generator(
                         float(chunks[2]), validChoices["Operators"][chunks[1]]
                     )

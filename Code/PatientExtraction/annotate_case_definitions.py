@@ -180,10 +180,12 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, validCh
                             if len(chunks) == 5:
                                 # If the restriction is a five argument restriction, then split it into two three
                                 # argument ones.
+                                chunks[2] = "Val" + chunks[2][1]  # Convert v1/v2 to Val1/Val2.
                                 fidAnnotateDefinitions.write(">{:s}\n".format(' '.join(chunks[:3])))
                                 fidAnnotateDefinitions.write(">{:s}\n".format(' '.join(chunks[2:])))
                             else:
                                 # Just write out a three argument restriction.
+                                line = line.replace('v', "Val")  # Convert v1/v2 to Val1/Val2.
                                 fidAnnotateDefinitions.write(">{:s}\n".format(line))
                     else:
                         # There is an incorrect number of arguments on the line.
@@ -206,6 +208,7 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, validCh
                                            "argument is not a number.".format(lineNum + 1, chunks[0]))
                         if not formatError:
                             # The line is correctly formatted, so write it out.
+                            line = line.replace('v', "Val")  # Convert v1/v2 to Val1/Val2.
                             fidAnnotateDefinitions.write(">{:s}\n".format(line))
                     else:
                         # There is an incorrect number of arguments on the line.
