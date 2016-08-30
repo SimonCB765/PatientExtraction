@@ -30,12 +30,11 @@ def main(fileCaseDefs, validChoices):
     :type fileCaseDefs:             str
     :param validChoices:            The valid modes, outputs and operators that can appear in the case definition file.
     :type validChoices:             dict
-    :return:                        1) A mapping from case definitions to the positive indicator codes, negative
-                                        indicator codes, modes, outputs and restrictions that make up the case
-                                        definition. Each case definition is indexed by its name and has as its
-                                        associated value a mapping containing keys:
-                                        "Positive" - A set of the positive indicator codes.
-                                        "Negative" - A set of the negative indicator codes.
+    :return:                        1) A mapping from case definitions to the case indicator codes, extraction modes,
+                                        output methods and restrictions that make up the case definition. Each case
+                                        definition is indexed by its name and has as its associated value a mapping
+                                        containing keys:
+                                        "Codes" - The set of codes that are used to identify cases.
                                         "Modes" - A set of the modes to use when extracting case information.
                                         "Outputs" - A set of the output methods to use when outputting case information.
                                         "Restrictions" - The restrictions in place on the patients selected. A
@@ -49,8 +48,7 @@ def main(fileCaseDefs, validChoices):
 
     # Define the variable needed for parsing.
     caseDefinitions = defaultdict(  # The mapping containing the case definitions in easily accessible format.
-        lambda: {"Modes": set(), "Negative": set(), "Outputs": set(), "Positive": set(),
-                 "Restrictions": {"Date": [], "v1": [], "v2": []}}
+        lambda: {"Codes": set(), "Modes": set(), "Outputs": set(), "Restrictions": {"Date": [], "v1": [], "v2": []}}
     )
     caseDefsOrder = []  # The case definitions in the order they appear in the user's input file.
     currentCaseDef = ""  # The current case definition being parsed.
@@ -109,15 +107,8 @@ def main(fileCaseDefs, validChoices):
                 line = line.replace('.', '')
                 code = (line.split('\t'))[0]
 
-                # Determine if the code is a negated code.
-                isNegativeCode = False
-                if code[0] == '-':
-                    # Found a negated code
-                    isNegativeCode = True
-                    code = code[1:]
-
                 # Add the code as an indicator for the case definition.
-                caseDefinitions[currentCaseDef]["Negative" if isNegativeCode else "Positive"].add(code)
+                caseDefinitions[currentCaseDef]["Codes"].add(code)
 
     # Make sure each case definition has a mode and output method.
     for i in caseDefinitions:

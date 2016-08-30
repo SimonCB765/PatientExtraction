@@ -1,6 +1,9 @@
 # PatientExtraction
 
 ## Input File Format
+
+Negative codes are just removed from the positives, they are not used to identify patients that should not exist in the set
+
 if the exact same condition name is used more than once, then the last one takes precedence
     all information from previous occurrences are removed
 Codes ending in % are expanded to contain all child codes

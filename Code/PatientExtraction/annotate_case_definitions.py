@@ -48,13 +48,12 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, validCh
                 # The line contains the name of a new case definition.
                 if currentConditionCodes:
                     # Write out the codes that make up the previous case definition.
-                    for i, j in currentConditionCodes.items():
-                        for k in sorted(j):
-                            description = mapCodeToDescription.get(k, "Code not recognised")
-                            if description == "Code not recognised":
-                                LOGGER.warning("Code {0:s} was not found in the dictionary.".format(k))
-                            fidAnnotateDefinitions.write("{0:s}{1:.<5}\t{2:s}\n".format(
-                                '-' if i == "Negative" else '', k, description))
+                    caseDefCodes = currentConditionCodes["Positive"] - currentConditionCodes["Negative"]
+                    for i in sorted(caseDefCodes):
+                        description = mapCodeToDescription.get(i, "Code not recognised")
+                        if description == "Code not recognised":
+                            LOGGER.warning("Code {:s} was not found in the dictionary.".format(i))
+                        fidAnnotateDefinitions.write("{:.<5}\t{:s}\n".format(i, description))
                 currentConditionCodes = {"Negative": set([]), "Positive": set([])}
 
                 # Write out the name of the next case definition.
@@ -244,10 +243,9 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, validCh
                 LOGGER.warning("Line {:d} contains a non-blank line that could not be processed.".format(lineNum + 1))
 
         # Write out the codes that make up the final case definition.
-        for i, j in currentConditionCodes.items():
-            for k in sorted(j):
-                description = mapCodeToDescription.get(k, "Code not recognised")
-                if description == "Code not recognised":
-                    LOGGER.warning("Code {0:s} was not found in the dictionary.".format(k))
-                fidAnnotateDefinitions.write("{0:s}{1:.<5}\t{2:s}\n".format(
-                    '-' if i == "Negative" else '', k, description))
+        caseDefCodes = currentConditionCodes["Positive"] - currentConditionCodes["Negative"]
+        for i in sorted(caseDefCodes):
+            description = mapCodeToDescription.get(i, "Code not recognised")
+            if description == "Code not recognised":
+                LOGGER.warning("Code {:s} was not found in the dictionary.".format(i))
+            fidAnnotateDefinitions.write("{:.<5}\t{:s}\n".format(i, description))
