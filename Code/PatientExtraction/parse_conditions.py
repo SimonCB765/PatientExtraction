@@ -61,7 +61,7 @@ def main(fileCaseDefs, validChoices):
             line = line.strip()
             if line[0] == '#':
                 # Found the start of a case definition.
-                line = line[1:]
+                line = line[2:]
                 currentCaseDef = re.sub("\s+", '_', line)
                 if currentCaseDef not in caseDefinitions:
                     # A case definition with the same name has not already been seen.
@@ -122,8 +122,12 @@ def main(fileCaseDefs, validChoices):
     # Make sure each case definition has a mode and output method.
     for i in caseDefinitions:
         if not caseDefinitions[i]["Modes"]:
-            caseDefinitions[i]["Modes"] = {"all"}
+            caseDefinitions[i]["Modes"] = ["all"]
+        else:
+            caseDefinitions[i]["Modes"] = sorted(caseDefinitions[i]["Modes"])
         if not caseDefinitions[i]["Outputs"]:
-            caseDefinitions[i]["Outputs"] = {"count"}
+            caseDefinitions[i]["Outputs"] = ["count"]
+        else:
+            caseDefinitions[i]["Outputs"] = sorted(caseDefinitions[i]["Outputs"])
 
     return caseDefinitions, caseDefsOrder
