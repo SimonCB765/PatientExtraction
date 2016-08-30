@@ -110,17 +110,14 @@ _selector = {"all": _all_selector,
              "min": _min_selector}
 
 
-def select_associations(medicalRecord, patientPosCondCodes, conditionRestrictions, modes=("all",)):
-    """Select information about the associations between a patient and their codes according to a mode and restrictions.
+def select_associations(medicalRecord, conditionRestrictions, modes=("all",)):
+    """Select information about the associations between a patient and their codes according to modes and restrictions.
 
     :param medicalRecord:           A patient's medical record.
     :type medicalRecord:            dict
-    :param patientPosCondCodes:     The positive indicator codes that a patient has for a given condition.
-    :type patientPosCondCodes:      set
     :param conditionRestrictions:   The data about the condition restrictions.
     :type conditionRestrictions     dict
-    :param modes:                   The method(s) for selecting which associations between the patient and their codes
-                                        should be selected.
+    :param modes:                   The method(s) for selecting associations between the patient and their codes.
     :type modes:                    list
     :return:                        The selected associations between patients and codes that meet the criteria.
                                         There is one entry in the dictionary per mode used. For each mode key in the
@@ -147,29 +144,24 @@ def select_associations(medicalRecord, patientPosCondCodes, conditionRestriction
 
     """
 
-    # Select all associations between the positive indicator codes and the patient.
-    selectedRecords = {i: medicalRecord[i] for i in patientPosCondCodes}
-
     # Remove associations that do not meet the restriction criteria.
     for i in conditionRestrictions:
-        # Go through each possible category of restrictions (dates, values, etc.).
+        # Go through each category of restrictions (values, dates, etc.).
         for j in conditionRestrictions[i]:
-            # Apply each individual restriction to the set of selected records to filter out those records not
-            # meeting the present restriction.
-            selectedRecords = {k: [l for l in selectedRecords[k] if j(l[i])] for k in selectedRecords}
+            # Filter the patient's record by the current restriction, leaving only those associations
+            # that meet the current restriction.
+            medicalRecord = {k: [l for l in medicalRecord[k] if j(l[i])] for k in medicalRecord}
 
-    # Filter out the codes that have no associations with the patient that satisfy the restriction criteria (i.e.
-    # remove all codes that now contain no associations in the selected records).
-    selectedRecords = {i: selectedRecords[i] for i in selectedRecords if selectedRecords[i]}
+    # Filter out codes that have had all associations with the patient removed by the restrictions.
+    medicalRecord = {i: medicalRecord[i] for i in medicalRecord if medicalRecord[i]}
 
-    if not selectedRecords:
-        # If there are no records with positive indicator codes that meet the restriction criteria, then return empty
-        # dictionaries for each mode.
+    if not medicalRecord:
+        # If there are no associations remaining, then return empty dictionaries for each mode.
         return {i: {} for i in modes}
 
-    # Select the records for each mode.
-    modeSelectedRecords = {}  # The records selected for each mode.
+    # Select a subset of the patient's medical record for each mode.
+    modeMedicalRecords = {}  # The medical record subsets.
     for mode in modes:
-        modeSelectedRecords[mode] = _selector[mode](selectedRecords)
+        modeMedicalRecords[mode] = _selector[mode](medicalRecord)
 
-    return modeSelectedRecords
+    return modeMedicalRecords
