@@ -140,7 +140,7 @@ logger.addHandler(logConsoleHandler)
 logger.info("Starting patient extraction.")
 validModes = ["earliest", "latest", "all", "max", "min"]  # The valid code selection modes.
 validOutputs = {"code", "count", "date", "max", "mean", "min", "value"}  # The valid output options.
-validOperators = {'>': operator.lt, ">=": operator.le,
-                  '<': operator.gt, "<=": operator.ge}  # The valid value restriction operators.
+validOperators = {'>': operator.gt, ">=": operator.ge,
+                  '<': operator.lt, "<=": operator.le}  # The valid value restriction operators.
 validChoices = {"Modes": validModes, "Operators": validOperators, "Outputs": validOutputs}
 patient_extraction.main(fileInput, dirOutput, filePatientData, fileCodeDescriptions, validChoices)

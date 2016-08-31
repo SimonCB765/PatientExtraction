@@ -176,17 +176,18 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, validCh
                                                .format(lineNum + 1))
                                 formatError = True
                         if not formatError:
-                            # The line is correctly formatted, so write it out.
+                            # The line is correctly formatted, so write it out. The first set of three arguments
+                            # represents a restriction of the form # OP val1|val2, but needs to be reversed to
+                            # val1|val2 OP # to be kept consistent with the other value restrictions. If this is not
+                            # done, then Val < 3 and 3 < Val1 have to be interpreted differently despite both
+                            # using the < operator.
+                            chunks[2] = chunks[2].capitalize()  # Convert val1/val2 to Val1/Val2.
+                            chunks[1] = chunks[1].translate({ord('>'): '<', ord('<'): '>'})  # Reverse operator.
+                            fidAnnotateDefinitions.write(">{:s}\n".format(' '.join(chunks[2::-1])))
                             if len(chunks) == 5:
-                                # If the restriction is a five argument restriction, then split it into two three
-                                # argument ones.
-                                chunks[2] = chunks[2].capitalize()  # Convert val1/val2 to Val1/Val2.
-                                fidAnnotateDefinitions.write(">{:s}\n".format(' '.join(chunks[:3])))
+                                # If the restriction is a five argument restriction, then write out the second three
+                                # argument restriction.
                                 fidAnnotateDefinitions.write(">{:s}\n".format(' '.join(chunks[2:])))
-                            else:
-                                # Just write out a three argument restriction.
-                                line = line.capitalize()  # Convert val1/val2 to Val1/Val2.
-                                fidAnnotateDefinitions.write(">{:s}\n".format(line))
                     else:
                         # There is an incorrect number of arguments on the line.
                         LOGGER.warning("Line {:d} contains {:d} values but value restrictions starting with a "

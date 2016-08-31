@@ -31,6 +31,9 @@ def date_generator(startDate, endDate):
 def value_generator(comparatorValue, comparison):
     """Generate a function for restricting extracted data based on the value of the code's association with a patient.
 
+    The comparison performed is always x OP ref, where ref is the reference/comparator value and x the variable to
+    compare against it, i.e. x < 3, y >= 5, etc.
+
     :param comparatorValue:     The reference value to compare against.
     :type comparatorValue:      float
     :param comparison:          The comparison to perform.
