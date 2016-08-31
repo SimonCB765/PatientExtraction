@@ -155,14 +155,14 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, validCh
                             LOGGER.warning("Line {:d} is a value restriction beginning with a number, but the second "
                                            "argument is not a valid operator.".format(lineNum + 1))
                             formatError = True
-                        if chunks[2] not in ["v1", "v2"]:
-                            # The second argument for a value restriction beginning with a number must be a valid
-                            # operator.
+                        if chunks[2] not in ["val1", "val2"]:
+                            # The third argument for a value restriction beginning with a number must be the name
+                            # of the value to restrict on.
                             LOGGER.warning("Line {:d} is a value restriction beginning with a number, but the second "
                                            "argument is not a valid operator.".format(lineNum + 1))
                             formatError = True
                         if len(chunks) == 5:
-                            # There are five arguments on the line, and therefore the format should be # OP v1/v2 OP #.
+                            # There are five arguments on the line, so the format should be # OP val1/val2 OP #.
                             if chunks[3] not in validChoices["Operators"]:
                                 # The fourth argument of a five argument value restriction must be a valid operator.
                                 LOGGER.warning("Line {:d} is a five argument value restriction beginning with a "
@@ -180,35 +180,35 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, validCh
                             if len(chunks) == 5:
                                 # If the restriction is a five argument restriction, then split it into two three
                                 # argument ones.
-                                chunks[2] = "Val" + chunks[2][1]  # Convert v1/v2 to Val1/Val2.
+                                chunks[2] = chunks[2].capitalize()  # Convert val1/val2 to Val1/Val2.
                                 fidAnnotateDefinitions.write(">{:s}\n".format(' '.join(chunks[:3])))
                                 fidAnnotateDefinitions.write(">{:s}\n".format(' '.join(chunks[2:])))
                             else:
                                 # Just write out a three argument restriction.
-                                line = line.replace('v', "Val")  # Convert v1/v2 to Val1/Val2.
+                                line = line.capitalize()  # Convert val1/val2 to Val1/Val2.
                                 fidAnnotateDefinitions.write(">{:s}\n".format(line))
                     else:
                         # There is an incorrect number of arguments on the line.
                         LOGGER.warning("Line {:d} contains {:d} values but value restrictions starting with a "
                                        "number should have 3 or 5.".format(lineNum + 1, len(chunks)))
-                elif chunks[0] in ["v1", "v2"]:
+                elif chunks[0] in ["val1", "val2"]:
                     # The control line may contain a value restriction, so check its format.
                     if len(chunks) == 3:
-                        # The line must be formatted as v1|v2 OP #.
+                        # The line must be formatted as val1|val2 OP #.
                         formatError = False
                         if chunks[1] not in validChoices["Operators"]:
-                            # The second argument for a value restriction beginning with v1 or v2 must be a valid
+                            # The second argument for a value restriction beginning with val1 or val2 must be a valid
                             # operator.
                             LOGGER.warning("Line {:d} is a value restriction beginning with {:s}, but the second "
                                            "argument is not a valid operator.".format(lineNum + 1, chunks[0]))
                             formatError = True
                         if not chunks[2].isdigit():
-                            # The third argument of a value restriction beginning with v1 or v2 must be a number.
+                            # The third argument of a value restriction beginning with val1 or val2 must be a number.
                             LOGGER.warning("Line {:d} is a value restriction beginning with {:s}, but the fifth "
                                            "argument is not a number.".format(lineNum + 1, chunks[0]))
                         if not formatError:
                             # The line is correctly formatted, so write it out.
-                            line = line.replace('v', "Val")  # Convert v1/v2 to Val1/Val2.
+                            line = line.capitalize()  # Convert val1/val2 to Val1/Val2.
                             fidAnnotateDefinitions.write(">{:s}\n".format(line))
                     else:
                         # There is an incorrect number of arguments on the line.
