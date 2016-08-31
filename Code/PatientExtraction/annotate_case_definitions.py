@@ -179,7 +179,7 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, validCh
                             # The line is correctly formatted, so write it out. The first set of three arguments
                             # represents a restriction of the form # OP val1|val2, but needs to be reversed to
                             # val1|val2 OP # to be kept consistent with the other value restrictions. If this is not
-                            # done, then Val < 3 and 3 < Val1 have to be interpreted differently despite both
+                            # done, then val1 < 3 and 3 < val1 have to be interpreted differently despite both
                             # using the < operator.
                             chunks[2] = chunks[2].capitalize()  # Convert val1/val2 to Val1/Val2.
                             chunks[1] = chunks[1].translate({ord('>'): '<', ord('<'): '>'})  # Reverse operator.
@@ -213,12 +213,12 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, validCh
                             fidAnnotateDefinitions.write(">{:s}\n".format(line))
                     else:
                         # There is an incorrect number of arguments on the line.
-                        LOGGER.warning("Line {:d} contains {:d} values but value restrictions starting with v1 "
-                                       "or v2 should have 3.".format(lineNum + 1, len(chunks)))
+                        LOGGER.warning("Line {:d} contains {:d} values but value restrictions starting with val1 "
+                                       "or val2 should have 3.".format(lineNum + 1, len(chunks)))
                 else:
                     # The control line starts with an incorrect value.
                     LOGGER.warning("The first argument on line {:d} was '{:s}', but should have been a number or one "
-                                   "of mode, out, from, v1 or v2.".format(lineNum + 1, chunks[0]))
+                                   "of mode, out, from, val1 or val2.".format(lineNum + 1, chunks[0]))
             elif codeMatcher.match(line):
                 # The line contains a code for a condition
                 code = line.replace('.', '')
