@@ -125,19 +125,19 @@ def select_associations(medicalRecord, conditionRestrictions, modes=("all",)):
                                         the patient and codes that meet the criteria, selected based on the mode.
                                         An example of the return dictionary is:
                                         {
-                                            'ALL':
+                                            "all":
                                                 {
-                                                    'C10E': [{'Date': datetime, 'Text': '..', 'Val1': 0.0, 'Val2': 0.0},
-                                                             {'Date': datetime, 'Text': '..', 'Val1': 0.0, 'Val2': 0.0},
+                                                    "C10E": [{"Date": datetime, "Text": "..", "Val1": 0.0, "Val2": 0.0},
+                                                             {"Date": datetime, "Text": "..", "Val1": 0.0, "Val2": 0.0},
                                                              ...
                                                             ]
-                                                    'C10F': [{'Date': datetime, 'Text': '..', 'Val1': 0.0, 'Val2': 0.0},
-                                                             {'Date': datetime, 'Text': '..', 'Val1': 0.0, 'Val2': 0.0},
+                                                    "C10F": [{"Date": datetime, "Text": "..", "Val1": 0.0, "Val2": 0.0},
+                                                             {"Date": datetime, "Text": "..", "Val1": 0.0, "Val2": 0.0},
                                                              ...
                                                             ],
                                                     ...
                                                 }
-                                            'MAX': {'XXX': [{'Date': datetime, 'Text': '..', 'Val1': 5.5, 'Val2': 0.0}]}
+                                            "max": {"XXX": [{"Date": datetime, "Text": "..", "Val1": 5.5, "Val2": 0.0}]}
                                             ...
                                         }
     :rtype:                         dict
