@@ -68,11 +68,13 @@ def main(fileCaseDefs, dirOutput, filePatientData, fileCodeDescriptions, validCh
                 )
 
             # Generate and record the output for the patient.
-            generatedOutput = generate_patient_output(extractedHistory, caseNames, caseDefinitions)
+            generatedOutput = generate_patient_output(
+                extractedHistory, caseNames, caseDefinitions, validChoices["Outputs"]
+            )
             fidExtraction.write("{:s}\t{:s}\n".format(patientID, generatedOutput))
 
 
-def generate_patient_output(extractedHistory, caseNames, caseDefinitions):
+def generate_patient_output(extractedHistory, caseNames, caseDefinitions, outputFunctions):
     """Generate the output string for a given patient.
 
     :param extractedHistory:    The subset of a patient's history that has been extracted for each mode and each case.
@@ -110,6 +112,8 @@ def generate_patient_output(extractedHistory, caseNames, caseDefinitions):
     :type caseNames:            list
     :param caseDefinitions:     The case definitions (i.e. mode, output, restriction and indicator code information).
     :type caseDefinitions:      dict
+    :param outputFunctions:     A mapping from valid output methods to the functions that implement them.
+    :type outputFunctions:      dict
     :return:                    The extracted patient data in the correct format for outputting.
     :rtype:                     str
 
@@ -125,42 +129,9 @@ def generate_patient_output(extractedHistory, caseNames, caseDefinitions):
             for mode in caseDefinitions[i]["Modes"]:
                 if mode in modesWithData:
                     # If using the given mode managed to collect any associations.
-                    extractedModeData = extractedHistory[i][mode]
+                    extractedModeData = extractedHistory[i][mode]  # Data extracted using the mode.
                     for out in caseDefinitions[i]["Outputs"]:
-                        if out == "count":
-                            # Get the number of associations between the patient and each code that indicates the
-                            # case applies to them, and then sum these numbers.
-                            count = sum(map(len, extractedModeData.values()))
-                            generatedOutput += "\t{:d}".format(count)
-                        elif out == "max":
-                            # Get the code association with the maximum value, and then output the value itself.
-                            maxAssoc = max([k for j in extractedModeData.values() for k in j], key=lambda x: x['Val1'])
-                            generatedOutput += "\t{:.2f}".format(maxAssoc["Val1"])
-                        elif out == "mean":
-                            # Get the code associations that indicate the case applies to the patient, and then take
-                            # the mean value of all these associations.
-                            associationValues = [k["Val1"] for j in extractedModeData.values() for k in j]
-                            meanValue = sum(associationValues) / len(associationValues)
-                            generatedOutput += "\t{:.2f}".format(meanValue)
-                        elif out == "min":
-                            # Get the code association with the minimum value, and then output the value itself.
-                            minAssoc = min([k for j in extractedModeData.values() for k in j], key=lambda x: x['Val1'])
-                            generatedOutput += "\t{:.2f}".format(minAssoc["Val1"])
-                        else:
-                            # Output choices where a positive indicator code is required to be selected first, so get an
-                            # arbitrary positive indicator code for the condition that the patient is associated with.
-                            code = next(iter(extractedModeData))
-                            if out == "value":
-                                # Get an arbitrary value associated with the code.
-                                value = extractedModeData[code][0]["Val1"]
-                                generatedOutput += "\t{:.2f}".format(value)
-                            elif out == "date":
-                                # Get an arbitrary date associated with the code.
-                                date = extractedModeData[code][0]["Date"]
-                                generatedOutput += "\t{:s}".format(date.strftime("%Y-%m-%d"))
-                            else:
-                                # Output choice is CODE, so just output the code.
-                                generatedOutput += "\t{:s}".format(code)
+                        generatedOutput += outputFunctions[out](extractedModeData)
                 else:
                     # Add blanks for each column associated with this mode, as using it we didn't get any association.
                     generatedOutput += ''.join(['\t' for _ in caseDefinitions[i]["Outputs"]])
