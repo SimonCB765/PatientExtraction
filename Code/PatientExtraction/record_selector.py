@@ -1,7 +1,7 @@
 """Functions to select a subset of records from a patient's medical history based on a specified mode."""
 
 
-def _all_selector(records):
+def all_selector(records):
     """Select all associations between a patient and their codes.
 
     :param records: A patient's medical records.
@@ -14,7 +14,7 @@ def _all_selector(records):
     return dict(records)
 
 
-def _earliest_selector(records):
+def earliest_selector(records):
     """Select the association between a patient and a code that occurred the longest ago.
 
     :param records: A patient's medical records.
@@ -38,7 +38,7 @@ def _earliest_selector(records):
     return {earliestCode: [earliestAssociation]}
 
 
-def _latest_selector(records):
+def latest_selector(records):
     """Select the association between a patient and a code that occurred most recently.
 
     :param records: A patient's medical records.
@@ -62,7 +62,7 @@ def _latest_selector(records):
     return {latestCode: [latestAssociation]}
 
 
-def _max_selector(records):
+def max_selector(records):
     """Select the association between a patient and a code that contains the largest value.
 
     :param records: A patient's medical records.
@@ -83,7 +83,7 @@ def _max_selector(records):
     return {maxCode: [maxAssociation]}
 
 
-def _min_selector(records):
+def min_selector(records):
     """Select the association between a patient and a code that contains the smallest value.
 
     :param records: A patient's medical records.
@@ -103,14 +103,8 @@ def _min_selector(records):
     minAssociation = min(minRecord[1], key=lambda x: x["Val1"])
     return {minCode: [minAssociation]}
 
-_selector = {"all": _all_selector,
-             "earliest": _earliest_selector,
-             "latest": _latest_selector,
-             "max": _max_selector,
-             "min": _min_selector}
 
-
-def select_associations(medicalRecord, conditionRestrictions, modes=("all",)):
+def select_associations(medicalRecord, conditionRestrictions, modes, selectionMap):
     """Select information about the associations between a patient and their codes according to modes and restrictions.
 
     :param medicalRecord:           A patient's medical record.
@@ -119,6 +113,10 @@ def select_associations(medicalRecord, conditionRestrictions, modes=("all",)):
     :type conditionRestrictions     dict
     :param modes:                   The method(s) for selecting associations between the patient and their codes.
     :type modes:                    list
+    :param selectionMap:            A mapping from mode names to the selector function used to select records
+                                        according to the mode, e.g. selectionMap["all"] = all_selector. All modes in
+                                        the modes argument must be present in selectionMap or an error will be thrown.
+    :type selectionMap:             dict
     :return:                        The selected associations between patients and codes that meet the criteria.
                                         There is one entry in the dictionary per mode used. For each mode key in the
                                         dictionary, the associated value is the dictionary of associations between
@@ -162,6 +160,6 @@ def select_associations(medicalRecord, conditionRestrictions, modes=("all",)):
     # Select a subset of the patient's medical record for each mode.
     modeMedicalRecords = {}  # The medical record subsets.
     for mode in modes:
-        modeMedicalRecords[mode] = _selector[mode](medicalRecord)
+        modeMedicalRecords[mode] = selectionMap[mode](medicalRecord)
 
     return modeMedicalRecords

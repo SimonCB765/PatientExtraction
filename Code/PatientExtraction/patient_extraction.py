@@ -64,7 +64,7 @@ def main(fileCaseDefs, dirOutput, filePatientData, fileCodeDescriptions, validCh
                 # Get the portion of the patient's record (if any) that indicates that this case applies to the patient.
                 caseSubset = {i: patientRecord[i] for i in caseDefinitions[i]["Codes"] if i in patientRecord}
                 extractedHistory[i] = record_selector.select_associations(
-                    caseSubset, caseDefinitions[i]["Restrictions"], caseDefinitions[i]["Modes"]
+                    caseSubset, caseDefinitions[i]["Restrictions"], caseDefinitions[i]["Modes"], validChoices["Modes"]
                 )
 
             # Generate and record the output for the patient.

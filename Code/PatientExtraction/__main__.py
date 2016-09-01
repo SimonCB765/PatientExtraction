@@ -13,6 +13,7 @@ import sys
 if __package__ == "PatientExtraction":
     # If the package is PatientExtraction, then relative imports are needed.
     from . import patient_extraction
+    from . import record_selector
 else:
     # The code was not called from within the Code directory using 'python -m PatientExtraction'.
     # Therefore, we need to add the top level Code directory to the search path and use absolute imports.
@@ -20,6 +21,7 @@ else:
     codeDir = os.path.abspath(os.path.join(currentDir, os.pardir))
     sys.path.append(codeDir)
     from PatientExtraction import patient_extraction
+    from PatientExtraction import record_selector
 
 
 # ====================== #
@@ -138,7 +140,9 @@ logger.addHandler(logConsoleHandler)
 # Perform the Patient Extraction #
 # ============================== #
 logger.info("Starting patient extraction.")
-validModes = ["earliest", "latest", "all", "max", "min"]  # The valid code selection modes.
+validModes = {"all": record_selector.all_selector, "earliest": record_selector.earliest_selector,
+              "latest": record_selector.latest_selector, "max": record_selector.max_selector,
+              "min": record_selector.min_selector}  # The valid code selection modes.
 validOutputs = {"code", "count", "date", "max", "mean", "min", "value"}  # The valid output options.
 validOperators = {'>': operator.gt, ">=": operator.ge,
                   '<': operator.lt, "<=": operator.le}  # The valid value restriction operators.
