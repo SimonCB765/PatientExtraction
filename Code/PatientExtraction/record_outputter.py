@@ -143,6 +143,51 @@ def mean_outputter(valType):
     return outputter
 
 
+def median_outputter(valType):
+    """Generate a function that will output the median valType value in the patient's record.
+
+    :param valType:     The type of value to output (i.e. Val1 or Val2).
+    :type valType:      str
+    :return:            A function that outputs the median valType value in the patient's record.
+    :rtype:             function
+
+    """
+
+    def outputter(record):
+        """Function to output te median valType value in the patient's record.
+
+        This function is primarily used when the record may contain multiple records, i.e. when the mode is all.
+
+        :param record:  A patient's medical record selected for outputting.
+        :type record:   dict
+        :return:        The contents of the record that should be output.
+        :rtype:         str
+
+        """
+
+        # Combine all the valType values of the code associations into one list and sort them.
+        associationValues = sorted([k[valType] for j in record.values() for k in j])
+
+        # If there is only one record, then return that record.
+        if len(associationValues) == 1:
+            return "{:.2f}".format(associationValues[0])
+
+        # Get the median value over the associations.
+        middleIndex = len(associationValues) // 2
+        if len(associationValues) % 2 == 0:
+            # There are an even number of code associations in the patient's record, so the median is the mean of the
+            # middle two values
+            medianValue = sum(associationValues[middleIndex - 1:middleIndex + 1]) / 2
+        else:
+            # There are an odd number of code associations in the patient's record, so te median is the middle one.
+            medianValue = associationValues[middleIndex]
+
+        # Return the valType value from this median association.
+        return "{:.2f}".format(medianValue)
+
+    return outputter
+
+
 def min_outputter(valType):
     """Generate a function that will output the minimum valType value in the patient's record.
 
