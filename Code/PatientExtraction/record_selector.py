@@ -62,46 +62,72 @@ def latest_selector(records):
     return {latestCode: [latestAssociation]}
 
 
-def max_selector(records):
-    """Select the association between a patient and a code that contains the largest value.
+def max_selector(valType):
+    """Generate a function that will perform the selection based on the maximum valType value.
 
-    :param records: A patient's medical records.
-    :type records:  dict
-    :return:        The association between the patient and code with the largest value.
-    :rtype:         dict
-
-    """
-
-    # Select the positive indicator code that has an association with the patient that contains the
-    # greatest value.
-    maxRecord = max(records.items(), key=lambda x: max([i["Val1"] for i in x[1]]))
-
-    # Determine the code associated with the max value and its association with the patient that actually has
-    # the max value.
-    maxCode = maxRecord[0]
-    maxAssociation = max(maxRecord[1], key=lambda x: x["Val1"])
-    return {maxCode: [maxAssociation]}
-
-
-def min_selector(records):
-    """Select the association between a patient and a code that contains the smallest value.
-
-    :param records: A patient's medical records.
-    :type records:  dict
-    :return:        The association between the patient and code with the smallest value.
-    :rtype:         dict
+    :param valType:     The type of value to select within the record (i.e. Val1 or Val2).
+    :type valType:      str
+    :return:            A function that selects the association between a patient and code that contains the largest
+                            valType value.
+    :rtype:             function
 
     """
 
-    # Select the association between one of the positive indicator codes and the patient that
-    # contains the smallest value.
-    minRecord = min(records.items(), key=lambda x: min([i["Val1"] for i in x[1]]))
+    def selector(records):
+        """Select the association between a patient and a code that contains the largest value.
 
-    # Determine the code associated with the min value and its association with the patient that actually has
-    # the min value.
-    minCode = minRecord[0]
-    minAssociation = min(minRecord[1], key=lambda x: x["Val1"])
-    return {minCode: [minAssociation]}
+        :param records: A patient's medical records.
+        :type records:  dict
+        :return:        The association between the patient and code with the largest value.
+        :rtype:         dict
+
+        """
+
+        # Select the positive indicator code that has an association with the patient that contains the
+        # greatest valType value.
+        maxRecord = max(records.items(), key=lambda x: max([i[valType] for i in x[1]]))
+
+        # Determine the code associated with the max value and its association with the patient that actually has
+        # the maximum value.
+        maxCode = maxRecord[0]
+        maxAssociation = max(maxRecord[1], key=lambda x: x[valType])
+        return {maxCode: [maxAssociation]}
+
+    return selector
+
+
+def min_selector(valType):
+    """Generate a function that will perform the selection based on the minimum valType value.
+
+    :param valType:     The type of value to select within the record (i.e. Val1 or Val2).
+    :type valType:      str
+    :return:            A function that selects the association between a patient and code that contains the smallest
+                            valType value.
+    :rtype:             function
+
+    """
+
+    def selector(records):
+        """Select the association between a patient and a code that contains the smallest value.
+
+        :param records: A patient's medical records.
+        :type records:  dict
+        :return:        The association between the patient and code with the smallest value.
+        :rtype:         dict
+
+        """
+
+        # Select the positive indicator code that has an association with the patient that contains the
+        # smallest valType value.
+        minRecord = min(records.items(), key=lambda x: min([i[valType] for i in x[1]]))
+
+        # Determine the code associated with the min value and its association with the patient that actually has
+        # the minimum value.
+        minCode = minRecord[0]
+        minAssociation = min(minRecord[1], key=lambda x: x[valType])
+        return {minCode: [minAssociation]}
+
+    return selector
 
 
 def select_associations(medicalRecord, conditionRestrictions, modes, selectionMap):
