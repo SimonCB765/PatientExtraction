@@ -23,6 +23,9 @@ def code_outputter(record):
     This function is primarily used when the record contains only one record, i.e. when the mode is one of max, min,
     earliest, latest, etc., as this makes the arbitrariness of the choice immaterial.
 
+    If record has no entries in it, then this function will throw a StopIteration error due to calling next on an
+    iterator with no more to return.
+
     :param record:  A patient's medical record selected for outputting.
     :type record:   dict
     :return:        The contents of the record that should be output.
@@ -59,6 +62,9 @@ def date_outputter(record):
     This function is primarily used when the record contains only one record, i.e. when the mode is one of max, min,
     earliest, latest, etc., as this makes the arbitrariness of the choice immaterial.
 
+    If record has no entries in it, then this function will throw a StopIteration error due to calling next on an
+    iterator with no more to return.
+
     :param record:  A patient's medical record selected for outputting.
     :type record:   dict
     :return:        The contents of the record that should be output.
@@ -89,6 +95,9 @@ def max_outputter(valType):
         """Function to output te maximum valType value in the patient's record.
 
         This function is primarily used when the record may contain multiple records, i.e. when the mode is all.
+
+        If record has no entries in it, then this function will throw a ValueError error due to the argument to max
+        being an empty list.
 
         :param record:  A patient's medical record selected for outputting.
         :type record:   dict
@@ -124,6 +133,9 @@ def mean_outputter(valType):
 
         This function is primarily used when the record may contain multiple records, i.e. when the mode is all.
 
+        If record has no entries in it, then this function will throw a ZeroDivisionError error due to the attempt to
+        divide by the length of the empty associationValues list.
+
         :param record:  A patient's medical record selected for outputting.
         :type record:   dict
         :return:        The contents of the record that should be output.
@@ -157,6 +169,8 @@ def median_outputter(valType):
         """Function to output te median valType value in the patient's record.
 
         This function is primarily used when the record may contain multiple records, i.e. when the mode is all.
+
+        If record has no entries in it, then this function will succeed, but will return a value of 0.0.
 
         :param record:  A patient's medical record selected for outputting.
         :type record:   dict
@@ -203,6 +217,9 @@ def min_outputter(valType):
 
         This function is primarily used when the record may contain multiple records, i.e. when the mode is all.
 
+        If record has no entries in it, then this function will throw a ValueError error due to the argument to min
+        being an empty list.
+
         :param record:  A patient's medical record selected for outputting.
         :type record:   dict
         :return:        The contents of the record that should be output.
@@ -237,6 +254,9 @@ def value_outputter(valType):
 
         This function is primarily used when the record contains only one record, i.e. when the mode is one of max, min,
         earliest, latest, etc., as this makes the arbitrariness of the choice immaterial.
+
+        If record has no entries in it, then this function will throw a StopIteration error due to calling next on an
+        iterator with no more to return.
 
         :param record:  A patient's medical record selected for outputting.
         :type record:   dict
