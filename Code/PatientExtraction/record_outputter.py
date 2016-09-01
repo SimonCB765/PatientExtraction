@@ -32,7 +32,7 @@ def code_outputter(record):
 
     # Get an arbitrary code from the patient's record. This will extract the 'first' code from the record dictionary.
     code = next(iter(record))
-    return "\t{:s}".format(code)
+    return "{:s}".format(code)
 
 
 def count_outputter(record):
@@ -50,7 +50,7 @@ def count_outputter(record):
     # Get the number of associations between the patient and each code in their record (via len), and then sum these
     # numbers.
     count = sum(map(len, record.values()))
-    return "\t{:d}".format(count)
+    return "{:d}".format(count)
 
 
 def date_outputter(record):
@@ -72,7 +72,7 @@ def date_outputter(record):
     # Get an arbitrary date associated with the code. As records are sorted chronologically, this will get the
     # earliest date in the record that the code was associated with the patient.
     date = record[code][0]["Date"]
-    return "\t{:s}".format(date.strftime("%Y-%m-%d"))
+    return "{:s}".format(date.strftime("%Y-%m-%d"))
 
 
 def max_outputter(valType):
@@ -104,7 +104,7 @@ def max_outputter(valType):
         maxAssociation = max(associations, key=lambda x: x[valType])
 
         # Return the valType value from this maximum association.
-        return "\t{:.2f}".format(maxAssociation[valType])
+        return "{:.2f}".format(maxAssociation[valType])
 
     return outputter
 
@@ -138,7 +138,7 @@ def mean_outputter(valType):
         meanValue = sum(associationValues) / len(associationValues)
 
         # Return the valType value from this mean association.
-        return "\t{:.2f}".format(meanValue)
+        return "{:.2f}".format(meanValue)
 
     return outputter
 
@@ -172,7 +172,7 @@ def min_outputter(valType):
         minAssociation = min(associations, key=lambda x: x[valType])
 
         # Return the valType value from this minimum association.
-        return "\t{:.2f}".format(minAssociation[valType])
+        return "{:.2f}".format(minAssociation[valType])
 
     return outputter
 
@@ -207,6 +207,6 @@ def value_outputter(valType):
         # Get an arbitrary value associated with the code. As records are sorted chronologically, this will get the
         # value associated with the earliest association in the record between the code and the patient.
         value = record[code][0]["Val1"]
-        return "\t{:.2f}".format(value)
+        return "{:.2f}".format(value)
 
     return outputter
