@@ -1,4 +1,4 @@
-"""Tests for the record_selector module."""
+"""Tests for the restriction_comparator_generators module."""
 
 # Python imports.
 import calendar
