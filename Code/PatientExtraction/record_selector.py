@@ -33,6 +33,12 @@ def all_selector(records):
 def earliest_selector(records):
     """Select the association between a patient and a code that occurred the longest ago.
 
+    This relies on the associations being sorted chronologically, thereby enabling additional loops to be
+    bypassed as the earliest association between a given code and a patient is first in the record of associations with
+    that code. For example code "A" may have a record of associations like
+    "A": [{"Date": "1990-10-30"}, {"Date": "1995-2-8"}, {"Date": "2001-7-23"}]. You can therefore just get the
+    association at index 0 to get the earliest association between the patient and code.
+
     :param records: A patient's medical records. See the module docstring for its format.
     :type records:  dict
     :return:        The association between the patient and code that occurred the longest ago.
@@ -56,6 +62,12 @@ def earliest_selector(records):
 
 def latest_selector(records):
     """Select the association between a patient and a code that occurred most recently.
+
+    This relies on the associations being sorted chronologically, thereby enabling additional loops to be
+    bypassed as the latest association between a given code and a patient is last in the record of associations with
+    that code. For example code "A" may have a record of associations like
+    "A": [{"Date": "1990-10-30"}, {"Date": "1995-2-8"}, {"Date": "2001-7-23"}]. You can therefore just get the
+    association at index -1 to get the latest association between the patient and code.
 
     :param records: A patient's medical records. See the module docstring for its format.
     :type records:  dict
