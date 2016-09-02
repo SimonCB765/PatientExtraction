@@ -23,7 +23,7 @@ def date_generator(startDate, endDate):
 
         """
 
-        return (date <= endDate) and (date >= startDate)
+        return startDate <= date <= endDate
 
     return date_comparator
 
