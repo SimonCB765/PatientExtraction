@@ -59,19 +59,69 @@ def main(fileCaseDefs, dirOutput, filePatientData, fileCodeDescriptions, validCh
                 for j in patientRecord[i]:
                     j["Date"] = datetime.datetime.strptime(j["Date"], "%Y-%m-%d")
 
-            # Select associations meeting the requirements for each case definition.
+            # Select the portion of the patient's record (i.e. code associations) meeting the requirements for each
+            # case definition.
             for i in caseNames:
-                # Get the portion of the patient's record (if any) that indicates that this case applies to the patient.
+                # Select associations involving the positive indicator codes.
                 caseSubset = {i: patientRecord[i] for i in caseDefinitions[i]["Codes"] if i in patientRecord}
-                extractedHistory[i] = record_selector.select_associations(
-                    caseSubset, caseDefinitions[i]["Restrictions"], caseDefinitions[i]["Modes"], validChoices["Modes"]
-                )
+                # Apply the restrictions to the positive indicator code associations.
+                caseSubset = apply_restrictions(caseSubset, caseDefinitions[i]["Restrictions"])
+                # Extract the subset of this restricted set of associations that the user desires (based on the modes).
+                if not caseSubset:
+                    # If there are no associations remaining, then return empty dictionaries for each mode.
+                    extractedHistory[i] = {j: {} for j in validChoices["Modes"]}
+                else:
+                    # Select the associations needed according the modes.
+                    extractedHistory[i] = record_selector.select_associations(
+                        caseSubset, caseDefinitions[i]["Modes"], validChoices["Modes"]
+                    )
 
             # Generate and record the output for the patient.
             generatedOutput = generate_patient_output(
                 extractedHistory, caseNames, caseDefinitions, validChoices["Outputs"]
             )
             fidExtraction.write("{:s}\t{:s}\n".format(patientID, generatedOutput))
+
+
+def apply_restrictions(medicalRecord, conditionRestrictions):
+    """Remove associations from a patient's medical history not meeting the restriction criteria for a case definition.
+
+    :param medicalRecord:           A patient's medical record. This should have the format:
+                                        {
+                                            "Code1": [
+                                                {"Val1": 0, "Val2": 0, "Date": datetime, "Text": ""},
+                                                {"Val1": 0, "Val2": 0, "Date": datetime, "Text": ""}
+                                            ],
+                                            "Code2": [{"Val1": 0, "Val2": 0, "Date": datetime, "Text": ""}],
+                                            "Code3": [
+                                                {"Val1": 0, "Val2": 0, "Date": datetime, "Text": ""},
+                                                {"Val1": 0, "Val2": 0, "Date": datetime, "Text": ""}
+                                            ]
+                                        }
+    :type medicalRecord:            dict
+    :param conditionRestrictions:   The data about the condition restrictions. This has the format:
+                                        {"Date": [], "Val1": [], "Val2": []}
+                                        where each list contains functions that apply the restrictions of the given
+                                        type (i.e. the "Date" list contains functions to implement the date-based
+                                        restrictions).
+    :type conditionRestrictions     dict
+    :return:                        The restricted patient's medical history in the same format as the input history.
+    :rtype:                         dict
+
+    """
+
+    # Remove associations that do not meet the restriction criteria.
+    for i in conditionRestrictions:
+        # Go through each category of restrictions (values, dates, etc.).
+        for j in conditionRestrictions[i]:
+            # Filter the patient's record by the current restriction, leaving only those associations
+            # that meet the current restriction.
+            medicalRecord = {k: [l for l in medicalRecord[k] if j(l[i])] for k in medicalRecord}
+
+    # Filter out codes that have had all associations with the patient removed by the restrictions.
+    medicalRecord = {i: medicalRecord[i] for i in medicalRecord if medicalRecord[i]}
+
+    return medicalRecord
 
 
 def generate_patient_output(extractedHistory, caseNames, caseDefinitions, outputFunctions):

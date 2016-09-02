@@ -1,10 +1,26 @@
-"""Functions to select a subset of records from a patient's medical history based on a specified mode."""
+"""Functions to select a subset of records from a patient's medical history based on a specified mode.
+
+A typical record will be a dictionary with contents along the lines of:
+
+{
+    "Code1": [
+        {"Val1": 0, "Val2": 0, "Date": datetime, "Text": ""},
+        {"Val1": 0, "Val2": 0, "Date": datetime, "Text": ""}
+    ],
+    "Code2": [{"Val1": 0, "Val2": 0, "Date": datetime, "Text": ""}],
+    "Code3": [
+        {"Val1": 0, "Val2": 0, "Date": datetime, "Text": ""},
+        {"Val1": 0, "Val2": 0, "Date": datetime, "Text": ""}
+    ]
+}
+
+"""
 
 
 def all_selector(records):
     """Select all associations between a patient and their codes.
 
-    :param records: A patient's medical records.
+    :param records: A patient's medical records. See the module docstring for its format.
     :type records:  dict
     :return:        All associations between a patient and their codes.
     :rtype:         dict
@@ -17,7 +33,7 @@ def all_selector(records):
 def earliest_selector(records):
     """Select the association between a patient and a code that occurred the longest ago.
 
-    :param records: A patient's medical records.
+    :param records: A patient's medical records. See the module docstring for its format.
     :type records:  dict
     :return:        The association between the patient and code that occurred the longest ago.
     :rtype:         dict
@@ -41,7 +57,7 @@ def earliest_selector(records):
 def latest_selector(records):
     """Select the association between a patient and a code that occurred most recently.
 
-    :param records: A patient's medical records.
+    :param records: A patient's medical records. See the module docstring for its format.
     :type records:  dict
     :return:        The association between the patient and code that occurred most recently.
     :rtype:         dict
@@ -65,7 +81,8 @@ def latest_selector(records):
 def max_selector(valType):
     """Generate a function that will perform the selection based on the maximum valType value.
 
-    :param valType:     The type of value to select within the record (i.e. Val1 or Val2).
+    :param valType:     The type of value to select within the record (i.e. Val1 or Val2). See the module docstring
+                            for its format.
     :type valType:      str
     :return:            A function that selects the association between a patient and code that contains the largest
                             valType value.
@@ -99,7 +116,8 @@ def max_selector(valType):
 def min_selector(valType):
     """Generate a function that will perform the selection based on the minimum valType value.
 
-    :param valType:     The type of value to select within the record (i.e. Val1 or Val2).
+    :param valType:     The type of value to select within the record (i.e. Val1 or Val2). See the module docstring
+                            for its format.
     :type valType:      str
     :return:            A function that selects the association between a patient and code that contains the smallest
                             valType value.
@@ -110,7 +128,7 @@ def min_selector(valType):
     def selector(records):
         """Select the association between a patient and a code that contains the smallest value.
 
-        :param records: A patient's medical records.
+        :param records: A patient's medical records. See the module docstring for its format.
         :type records:  dict
         :return:        The association between the patient and code with the smallest value.
         :rtype:         dict
@@ -130,13 +148,11 @@ def min_selector(valType):
     return selector
 
 
-def select_associations(medicalRecord, conditionRestrictions, modes, selectionMap):
+def select_associations(medicalRecord, modes, selectionMap):
     """Select information about the associations between a patient and their codes according to modes and restrictions.
 
-    :param medicalRecord:           A patient's medical record.
+    :param medicalRecord:           A patient's medical record. See the module docstring for its format.
     :type medicalRecord:            dict
-    :param conditionRestrictions:   The data about the condition restrictions.
-    :type conditionRestrictions     dict
     :param modes:                   The method(s) for selecting associations between the patient and their codes.
     :type modes:                    list
     :param selectionMap:            A mapping from mode names to the selector function used to select records
@@ -167,21 +183,6 @@ def select_associations(medicalRecord, conditionRestrictions, modes, selectionMa
     :rtype:                         dict
 
     """
-
-    # Remove associations that do not meet the restriction criteria.
-    for i in conditionRestrictions:
-        # Go through each category of restrictions (values, dates, etc.).
-        for j in conditionRestrictions[i]:
-            # Filter the patient's record by the current restriction, leaving only those associations
-            # that meet the current restriction.
-            medicalRecord = {k: [l for l in medicalRecord[k] if j(l[i])] for k in medicalRecord}
-
-    # Filter out codes that have had all associations with the patient removed by the restrictions.
-    medicalRecord = {i: medicalRecord[i] for i in medicalRecord if medicalRecord[i]}
-
-    if not medicalRecord:
-        # If there are no associations remaining, then return empty dictionaries for each mode.
-        return {i: {} for i in modes}
 
     # Select a subset of the patient's medical record for each mode.
     modeMedicalRecords = {}  # The medical record subsets.
