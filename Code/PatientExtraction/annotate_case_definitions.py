@@ -169,7 +169,7 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, isLoggi
                             LOGGER.warning("Line {:d} contains {:d} arguments but date restrictions need 2 or 4."
                                            .format(lineNum + 1, len(chunks)))
                 elif isFirstElemNumeric:
-                    # We need to strip off any negative signs as isdigit will count '-X' as a non-digit.
+                    # The control line may contain a value restriction, so check its format.
                     if len(chunks) in [3, 5]:
                         # The line has the correct number of arguments.
                         formatError = False
@@ -250,8 +250,8 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, isLoggi
                 else:
                     # The control line starts with an incorrect value.
                     if isLoggingEnabled:
-                        LOGGER.warning("The first argument on line {:d} was '{:s}', but should have been a number or one "
-                                       "of mode, out, from, val1 or val2.".format(lineNum + 1, chunks[0]))
+                        LOGGER.warning("The first argument on line {:d} was '{:s}', but should have been a number or "
+                                       "one of mode, out, from, val1 or val2.".format(lineNum + 1, chunks[0]))
             elif codeMatcher.match(line):
                 # The line contains a code for a condition
                 code = line.replace('.', '')
