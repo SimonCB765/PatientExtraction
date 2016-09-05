@@ -7,7 +7,7 @@ import os
 
 # User imports.
 from . import annotate_case_definitions
-from . import parse_conditions
+from . import parse_case_definitions
 from . import record_selector
 
 
@@ -34,7 +34,7 @@ def main(fileCaseDefs, dirOutput, filePatientData, fileCodeDescriptions, validCh
     annotate_case_definitions.main(fileCaseDefs, fileCodeDescriptions, fileAnnotatedCaseDefs, validChoices)
 
     # Extract the case definitions from the file of case definitions.
-    caseDefinitions, caseNames = parse_conditions.main(fileAnnotatedCaseDefs, validChoices)
+    caseDefinitions, caseNames = parse_case_definitions.main(fileAnnotatedCaseDefs, validChoices)
 
     # Extract the patient data.
     fileExtractIon = os.path.join(dirOutput, "DataExtraction.tsv")
