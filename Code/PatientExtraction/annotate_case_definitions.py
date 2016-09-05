@@ -40,7 +40,7 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, isLoggi
     # Annotate the Case Definitions #
     # ============================= #
     codeMatcher = re.compile("^-?[a-zA-Z0-9]+\.*%?$")  # Regular expression to identify correctly formatted codes.
-    currentConditionCodes = {"Negative": set([]), "Positive": set([])}
+    currentCaseCodes = {"Negative": set([]), "Positive": set([])}
     with open(fileDefinitions, 'r') as fidDefinitions, open(fileAnnotateDefinitions, 'w') as fidAnnotateDefinitions:
         for lineNum, line in enumerate(fidDefinitions):
             line = line.strip()
@@ -49,15 +49,15 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, isLoggi
                 pass
             elif line[0] == '#':
                 # The line contains the name of a new case definition.
-                if currentConditionCodes:
+                if currentCaseCodes:
                     # Write out the codes that make up the previous case definition.
-                    caseDefCodes = currentConditionCodes["Positive"] - currentConditionCodes["Negative"]
+                    caseDefCodes = currentCaseCodes["Positive"] - currentCaseCodes["Negative"]
                     for i in sorted(caseDefCodes):
                         description = mapCodeToDescription.get(i, "Code not recognised")
                         if description == "Code not recognised" and isLoggingEnabled:
                             LOGGER.warning("Code {:s} was not found in the dictionary.".format(i))
                         fidAnnotateDefinitions.write("{:.<5}\t{:s}\n".format(i, description))
-                currentConditionCodes = {"Negative": set([]), "Positive": set([])}
+                currentCaseCodes = {"Negative": set([]), "Positive": set([])}
 
                 # Write out the name of the next case definition.
                 line = re.sub("\s+", ' ', line)  # Turn consecutive whitespace into a single space.
@@ -272,23 +272,23 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, isLoggi
 
                 # Determine if the code needs expanding to include child codes.
                 if code[-1] == '%':
-                    # Found a code that needs expanding to include child codes.
+                    # Found a code that needs expanding to include child codes. If the code can not be found in the
+                    # code to description mapping, then only the code itself will be added to the list of indicator
+                    # codes for the case.
                     code = code[:-1]
                     codeList = [i for i in mapCodeToDescription if i[:len(code)] == code]
-                else:
-                    # Found a code that does not need expanding to include child codes.
-                    codeList = [code]
-
-                # Add the codes to the list of codes for this condition.
-                for i in codeList:
-                    currentConditionCodes[codeType].add(i)
+                    for i in codeList:
+                        currentCaseCodes[codeType].add(i)
+                # Make sure the code itself is added to the list.
+                currentCaseCodes[codeType].add(code)
             else:
                 # The line does not appear to contain valid information, so log this and skip it.
                 if isLoggingEnabled:
-                    LOGGER.warning("Line {:d} contains a non-blank line that could not be processed.".format(lineNum + 1))
+                    LOGGER.warning("Line {:d} contains a non-blank line that could not be processed."
+                                   .format(lineNum + 1))
 
         # Write out the codes that make up the final case definition.
-        caseDefCodes = currentConditionCodes["Positive"] - currentConditionCodes["Negative"]
+        caseDefCodes = currentCaseCodes["Positive"] - currentCaseCodes["Negative"]
         for i in sorted(caseDefCodes):
             description = mapCodeToDescription.get(i, "Code not recognised")
             if description == "Code not recognised" and isLoggingEnabled:
