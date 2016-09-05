@@ -38,8 +38,10 @@ class TestDateComparator(unittest.TestCase):
             startDate = self.generate_date(startYear=1900, endYear=2000)
             endDate = self.generate_date(startYear=startDate.year + 10, endYear=2010)
             compFunc = restriction_comparator_generators.date_generator(startDate, endDate)
+            compFunc2 = restriction_comparator_generators.date_generator(startDate)  # End date is set to current date.
             testDate = self.generate_date(startYear=startDate.year + 1, endYear=endDate.year - 1)
             self.assertTrue(compFunc(testDate))
+            self.assertTrue(compFunc2(testDate))
 
         # Generate dates that should fail as they occur before the start year.
         for i in range(100):

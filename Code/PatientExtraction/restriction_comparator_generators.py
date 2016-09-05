@@ -1,7 +1,10 @@
 """Closures to generate comparison functions for the value- and date-based restrictions."""
 
+# Python imports.
+import datetime
 
-def date_generator(startDate, endDate):
+
+def date_generator(startDate, endDate=None):
     """Generate a function for restricting extracted data based on the date of the code's association with a patient.
 
     :param startDate:   The beginning date for the restriction.
@@ -12,6 +15,10 @@ def date_generator(startDate, endDate):
     :rtype:             function
 
     """
+
+    if not endDate:
+        # If there is no end date specified, then set the end date to today's date.
+        endDate = datetime.datetime.now()
 
     def date_comparator(date):
         """Check whether a date falls in a given range.

@@ -79,12 +79,12 @@ def main(fileCaseDefs):
                     # Found a line recording a date range restriction to use for this case definition.
                     startDate = datetime.datetime.strptime(chunks[1], "%Y-%m-%d")
                     if len(chunks) == 2:
-                        # The restriction is to have an end date of today's date.
-                        endDate = datetime.datetime.now()
+                        # The restriction only has a start date.
+                        comparisonFunc = restriction_comparator_generators.date_generator(startDate)
                     else:
                         # The restriction has both start and end dates.
                         endDate = datetime.datetime.strptime(chunks[3], "%Y-%m-%d")
-                    comparisonFunc = restriction_comparator_generators.date_generator(startDate, endDate)
+                        comparisonFunc = restriction_comparator_generators.date_generator(startDate, endDate)
                     caseDefinitions[currentCaseDef]["Restrictions"]["Date"].append(comparisonFunc)
                 elif chunks[0].isdigit():
                     # Found a line recording a value-based restriction starting with a number.
