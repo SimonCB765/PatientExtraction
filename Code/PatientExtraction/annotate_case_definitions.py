@@ -69,12 +69,24 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, isLoggi
                 line = (line[1:].strip()).lower()  # Make everything lowercase.
                 chunks = line.split()
 
-                # Check the correctness of the control line.
+                # Check whether the control line is blank.
+                isFirstElemNumeric = False
                 if len(chunks) == 0:
-                    # The control line needs more information on it.
+                    # The control line needs more information on it, so skip the rest of the chekcing of the line.
                     if isLoggingEnabled:
                         LOGGER.warning("Line {:d} contains no control information.".format(lineNum + 1))
-                elif chunks[0] == "mode":
+                    continue
+                else:
+                    # Check if the first entry on the line is a numeric value.
+                    try:
+                        float(chunks[0])
+                        isFirstElemNumeric = True
+                    except ValueError:
+                        # Wasn't a float.
+                        pass
+
+                # Check the correctness of the control line.
+                if chunks[0] == "mode":
                     modeChoices = [i for i in chunks[1:]]
                     invalidModeChoices = [i for i in modeChoices if i not in conf.validChoices["Modes"]]
                     if invalidModeChoices:
@@ -148,7 +160,7 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, isLoggi
                                 # parsed as a date.
                                 if isLoggingEnabled:
                                     LOGGER.warning("Line {:d} is a four argument date restriction. The second and "
-                                                   "fourth arguments should be YYYY-MM-DD formatted dates, but were"
+                                                   "fourth arguments should be YYYY-MM-DD formatted dates, but were "
                                                    "{:s} and {:s} respectively.".format(lineNum + 1, chunks[1],
                                                                                         chunks[3]))
                     else:
@@ -156,8 +168,8 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, isLoggi
                         if isLoggingEnabled:
                             LOGGER.warning("Line {:d} contains {:d} arguments but date restrictions need 2 or 4."
                                            .format(lineNum + 1, len(chunks)))
-                elif chunks[0].isdigit():
-                    # The control line may contain a value restriction, so check its format.
+                elif isFirstElemNumeric:
+                    # We need to strip off any negative signs as isdigit will count '-X' as a non-digit.
                     if len(chunks) in [3, 5]:
                         # The line has the correct number of arguments.
                         formatError = False
