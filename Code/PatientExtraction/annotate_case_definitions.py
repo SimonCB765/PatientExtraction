@@ -5,11 +5,14 @@ import datetime
 import logging
 import re
 
+# User imports.
+from . import conf
+
 # Globals.
 LOGGER = logging.getLogger(__name__)
 
 
-def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, validChoices):
+def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions):
     """Annotate a file of case definitions by expanding all defining codes.
 
     :param fileDefinitions:         The location of the file containing the case definitions.
@@ -18,8 +21,6 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, validCh
     :type fileCodeDescriptions:     str
     :param fileAnnotateDefinitions: The location of the file to write the annotated input file to.
     :type fileAnnotateDefinitions:  str
-    :param validChoices:            The valid modes, outputs and operators that can appear in the case definition file.
-    :type validChoices:             dict
 
     """
 
@@ -72,7 +73,7 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, validCh
                     LOGGER.warning("Line {:d} contains no control information.".format(lineNum + 1))
                 elif chunks[0] == "mode":
                     modeChoices = [i for i in chunks[1:]]
-                    invalidModeChoices = [i for i in modeChoices if i not in validChoices["Modes"]]
+                    invalidModeChoices = [i for i in modeChoices if i not in conf.validChoices["Modes"]]
                     if invalidModeChoices:
                         # Some modes on this line are not valid mode choices.
                         LOGGER.warning("Line {:d} contains invalid modes [{:s}] that will be ignored."
@@ -87,7 +88,7 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, validCh
                         fidAnnotateDefinitions.write(">{:s}\n".format(line))
                 elif chunks[0] == "out":
                     outChoices = [i for i in chunks[1:]]
-                    invalidOutChoices = [i for i in outChoices if i not in validChoices["Outputs"]]
+                    invalidOutChoices = [i for i in outChoices if i not in conf.validChoices["Outputs"]]
                     if invalidOutChoices:
                         # Some output methods on this line are not valid output choices.
                         LOGGER.warning("Line {:d} contains invalid output methods [{:s}] that will be ignored."
@@ -149,7 +150,7 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, validCh
                     if len(chunks) in [3, 5]:
                         # The line has the correct number of arguments.
                         formatError = False
-                        if chunks[1] not in validChoices["Operators"]:
+                        if chunks[1] not in conf.validChoices["Operators"]:
                             # The second argument for a value restriction beginning with a number must be a valid
                             # operator.
                             LOGGER.warning("Line {:d} is a value restriction beginning with a number, but the second "
@@ -163,7 +164,7 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, validCh
                             formatError = True
                         if len(chunks) == 5:
                             # There are five arguments on the line, so the format should be # OP val1/val2 OP #.
-                            if chunks[3] not in validChoices["Operators"]:
+                            if chunks[3] not in conf.validChoices["Operators"]:
                                 # The fourth argument of a five argument value restriction must be a valid operator.
                                 LOGGER.warning("Line {:d} is a five argument value restriction beginning with a "
                                                "number, but the fourth argument is not a valid operator."
@@ -197,7 +198,7 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, validCh
                     if len(chunks) == 3:
                         # The line must be formatted as val1|val2 OP #.
                         formatError = False
-                        if chunks[1] not in validChoices["Operators"]:
+                        if chunks[1] not in conf.validChoices["Operators"]:
                             # The second argument for a value restriction beginning with val1 or val2 must be a valid
                             # operator.
                             LOGGER.warning("Line {:d} is a value restriction beginning with {:s}, but the second "

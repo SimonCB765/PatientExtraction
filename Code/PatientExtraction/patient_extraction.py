@@ -7,11 +7,11 @@ import os
 
 # User imports.
 from . import annotate_case_definitions
+from . import conf
 from . import parse_case_definitions
-from . import record_selector
 
 
-def main(fileCaseDefs, dirOutput, filePatientData, fileCodeDescriptions, validChoices):
+def main(fileCaseDefs, dirOutput, filePatientData, fileCodeDescriptions):
     """Run the patient extraction.
 
     :param fileCaseDefs:            The location of the input file containing the case definitions.
@@ -22,8 +22,6 @@ def main(fileCaseDefs, dirOutput, filePatientData, fileCodeDescriptions, validCh
     :type filePatientData:          str
     :param fileCodeDescriptions:    The location of the file containing the mapping from codes to their descriptions.
     :type fileCodeDescriptions:     str
-    :param validChoices:            The valid modes, outputs and operators that can appear in the case definition file.
-    :type validChoices:             dict
 
     """
 
@@ -31,10 +29,10 @@ def main(fileCaseDefs, dirOutput, filePatientData, fileCodeDescriptions, validCh
     annotatedCaseDefsName = os.path.split(fileCaseDefs)[1]
     annotatedCaseDefsName = annotatedCaseDefsName.split('.')[0] + "_Annotated." + annotatedCaseDefsName.split('.')[1]
     fileAnnotatedCaseDefs = os.path.join(dirOutput, annotatedCaseDefsName)
-    annotate_case_definitions.main(fileCaseDefs, fileCodeDescriptions, fileAnnotatedCaseDefs, validChoices)
+    annotate_case_definitions.main(fileCaseDefs, fileCodeDescriptions, fileAnnotatedCaseDefs)
 
     # Extract the case definitions from the file of case definitions.
-    caseDefinitions, caseNames = parse_case_definitions.main(fileAnnotatedCaseDefs, validChoices)
+    caseDefinitions, caseNames = parse_case_definitions.main(fileAnnotatedCaseDefs)
 
     # Extract the patient data.
     fileExtractIon = os.path.join(dirOutput, "DataExtraction.tsv")
@@ -69,17 +67,13 @@ def main(fileCaseDefs, dirOutput, filePatientData, fileCodeDescriptions, validCh
                 # Extract the subset of this restricted set of associations that the user desires (based on the modes).
                 if not caseSubset:
                     # If there are no associations remaining, then return empty dictionaries for each mode.
-                    extractedHistory[i] = {j: {} for j in validChoices["Modes"]}
+                    extractedHistory[i] = {j: {} for j in conf.validChoices["Modes"]}
                 else:
                     # Select the associations needed according the modes.
-                    extractedHistory[i] = record_selector.select_associations(
-                        caseSubset, caseDefinitions[i]["Modes"], validChoices["Modes"]
-                    )
+                    extractedHistory[i] = select_associations(caseSubset, caseDefinitions[i]["Modes"])
 
             # Generate and record the output for the patient.
-            generatedOutput = generate_patient_output(
-                extractedHistory, caseNames, caseDefinitions, validChoices["Outputs"]
-            )
+            generatedOutput = generate_patient_output(extractedHistory, caseNames, caseDefinitions)
             fidExtraction.write("{:s}\t{:s}\n".format(patientID, generatedOutput))
 
 
@@ -124,7 +118,7 @@ def apply_restrictions(medicalRecord, conditionRestrictions):
     return medicalRecord
 
 
-def generate_patient_output(extractedHistory, caseNames, caseDefinitions, outputFunctions):
+def generate_patient_output(extractedHistory, caseNames, caseDefinitions):
     """Generate the output string for a given patient.
 
     :param extractedHistory:    The subset of a patient's history that has been extracted for each mode and each case.
@@ -162,8 +156,6 @@ def generate_patient_output(extractedHistory, caseNames, caseDefinitions, output
     :type caseNames:            list
     :param caseDefinitions:     The case definitions (i.e. mode, output, restriction and indicator code information).
     :type caseDefinitions:      dict
-    :param outputFunctions:     A mapping from valid output methods to the functions that implement them.
-    :type outputFunctions:      dict
     :return:                    The extracted patient data in the correct format for outputting.
     :rtype:                     str
 
@@ -181,7 +173,7 @@ def generate_patient_output(extractedHistory, caseNames, caseDefinitions, output
                     # If using the given mode managed to collect any associations.
                     extractedModeData = extractedHistory[i][mode]  # Data extracted using the mode.
                     for out in caseDefinitions[i]["Outputs"]:
-                        generatedOutput.append(outputFunctions[out](extractedModeData))
+                        generatedOutput.append(conf.validChoices["Outputs"][out](extractedModeData))
                 else:
                     # Add blanks for each column associated with this mode, as using it we didn't get any association.
                     generatedOutput.extend(['' for _ in caseDefinitions[i]["Outputs"]])
@@ -192,3 +184,43 @@ def generate_patient_output(extractedHistory, caseNames, caseDefinitions, output
             )
 
     return '\t'.join(generatedOutput)
+
+
+def select_associations(medicalRecord, modes):
+    """Select information about the associations between a patient and their codes according to modes and restrictions.
+
+    :param medicalRecord:           A patient's medical record. See the module docstring for its format.
+    :type medicalRecord:            dict
+    :param modes:                   The method(s) for selecting associations between the patient and their codes.
+    :type modes:                    list
+    :return:                        The selected associations between patients and codes that meet the criteria.
+                                        There is one entry in the dictionary per mode used. For each mode key in the
+                                        dictionary, the associated value is the dictionary of associations between
+                                        the patient and codes that meet the criteria, selected based on the mode.
+                                        An example of the return dictionary is:
+                                        {
+                                            "all":
+                                                {
+                                                    "C10E": [{"Date": datetime, "Text": "..", "Val1": 0.0, "Val2": 0.0},
+                                                             {"Date": datetime, "Text": "..", "Val1": 0.0, "Val2": 0.0},
+                                                             ...
+                                                            ]
+                                                    "C10F": [{"Date": datetime, "Text": "..", "Val1": 0.0, "Val2": 0.0},
+                                                             {"Date": datetime, "Text": "..", "Val1": 0.0, "Val2": 0.0},
+                                                             ...
+                                                            ],
+                                                    ...
+                                                }
+                                            "max": {"XXX": [{"Date": datetime, "Text": "..", "Val1": 5.5, "Val2": 0.0}]}
+                                            ...
+                                        }
+    :rtype:                         dict
+
+    """
+
+    # Select a subset of the patient's medical record for each mode.
+    modeMedicalRecords = {}  # The medical record subsets.
+    for mode in modes:
+        modeMedicalRecords[mode] = conf.validChoices["Modes"][mode](medicalRecord)
+
+    return modeMedicalRecords

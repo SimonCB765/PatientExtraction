@@ -4,26 +4,19 @@
 import argparse
 import datetime
 import logging
-import operator
 import os
 import shutil
 import sys
 
 # User imports.
-if __package__ == "PatientExtraction":
-    # If the package is PatientExtraction, then relative imports are needed.
-    from . import patient_extraction
-    from . import record_outputter
-    from . import record_selector
-else:
+if __package__ != "PatientExtraction":
     # The code was not called from within the Code directory using 'python -m PatientExtraction'.
-    # Therefore, we need to add the top level Code directory to the search path and use absolute imports.
+    # Therefore, we need to add the top level Code directory in order to use absolute imports.
     currentDir = os.path.dirname(os.path.join(os.getcwd(), __file__))  # Directory containing this file.
     codeDir = os.path.abspath(os.path.join(currentDir, os.pardir))
     sys.path.append(codeDir)
-    from PatientExtraction import patient_extraction
-    from PatientExtraction import record_outputter
-    from PatientExtraction import record_selector
+from PatientExtraction import conf
+from PatientExtraction import patient_extraction
 
 
 # ====================== #
@@ -142,18 +135,5 @@ logger.addHandler(logConsoleHandler)
 # Perform the Patient Extraction #
 # ============================== #
 logger.info("Starting patient extraction.")
-validModes = {"all": record_selector.all_selector, "earliest": record_selector.earliest_selector,
-              "latest": record_selector.latest_selector, "max1": record_selector.max_selector("Val1"),
-              "max2": record_selector.max_selector("Val2"), "min1": record_selector.min_selector("Val1"),
-              "min2": record_selector.min_selector("Val2")}  # The valid code selection modes.
-validOutputs = {"code": record_outputter.code_outputter, "count": record_outputter.count_outputter,
-                "date": record_outputter.date_outputter, "max1": record_outputter.max_outputter("Val1"),
-                "max2": record_outputter.max_outputter("Val2"), "mean1": record_outputter.mean_outputter("Val1"),
-                "mean2": record_outputter.mean_outputter("Val2"), "median1": record_outputter.median_outputter("Val1"),
-                "median2": record_outputter.median_outputter("Val2"), "min1": record_outputter.min_outputter("Val1"),
-                "min2": record_outputter.min_outputter("Val2"), "value1": record_outputter.value_outputter("Val1"),
-                "value2": record_outputter.value_outputter("Val2")}  # The valid output options.
-validOperators = {'>': operator.gt, ">=": operator.ge,
-                  '<': operator.lt, "<=": operator.le}  # The valid value restriction operators.
-validChoices = {"Modes": validModes, "Operators": validOperators, "Outputs": validOutputs}
-patient_extraction.main(fileInput, dirOutput, filePatientData, fileCodeDescriptions, validChoices)
+conf.init()  # Initialise the settings-like global variables.
+patient_extraction.main(fileInput, dirOutput, filePatientData, fileCodeDescriptions)
