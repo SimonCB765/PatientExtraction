@@ -1,11 +1,11 @@
-# Ignore all the configuration files.
-ConfigFiles/*
-
 # Ignore all files in the Data directory.
 Data/*
 
 # Ignore all files in the Results directory.
 Results/*
+
+# Ignore temporary test output files.
+Code/tests/**/TestData/Temp*
 
 # Ignore compiled Python files.
 *.pyc
