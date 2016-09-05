@@ -3,11 +3,11 @@
 # Python imports.
 import calendar
 import datetime
-import operator
 import random
 import unittest
 
 # User imports.
+from PatientExtraction import conf
 from PatientExtraction import restriction_comparator_generators
 
 
@@ -73,8 +73,9 @@ class TestValueComparator(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        # Define operators as they are in __main__.py
-        cls.validOperators = {'>': operator.gt, ">=": operator.ge, '<': operator.lt, "<=": operator.le}
+        # Define operators as they are for the main program.
+        conf.init()
+        cls.validOperators = conf.validChoices["Operators"]
 
     def test_comp_func_generation(self):
         # Test less than generation, e.g. x < 3, x < 10.
