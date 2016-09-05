@@ -23,8 +23,8 @@ class TestSelectors(unittest.TestCase):
         # Determine the files needed to load the data and the expected results of the tests.
         dirCurrent = os.path.dirname(os.path.join(os.getcwd(), __file__))  # Directory containing this file.
         dirData = os.path.abspath(os.path.join(dirCurrent, "TestData"))
-        fileData = os.path.join(dirData, "RecordSelectorData.json")
-        fileOutput = os.path.join(dirData, "RecordSelectorOutput.json")
+        fileData = os.path.join(dirData, "RecordSelector", "Data.json")
+        fileOutput = os.path.join(dirData, "RecordSelector", "ExpectedOutput.json")
 
         # Load the patient data (replacing all dates in their string format with datetime.datetime objects).
         fidData = open(fileData, 'r')

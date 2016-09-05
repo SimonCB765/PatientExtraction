@@ -5,7 +5,7 @@ Data/*
 Results/*
 
 # Ignore temporary test output files.
-Code/tests/**/TestData/Temp*
+Code/tests/**/Temp*
 
 # Ignore compiled Python files.
 *.pyc
