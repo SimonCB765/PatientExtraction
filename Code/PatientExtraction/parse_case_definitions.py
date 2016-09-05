@@ -110,7 +110,7 @@ def main(fileCaseDefs):
                 caseDefinitions[currentCaseDef]["Codes"].add(code)
 
     # Make sure each case definition has a mode and output method.
-    for i in caseDefinitions:
+    for i in caseDefsOrder:
         if not caseDefinitions[i]["Modes"]:
             caseDefinitions[i]["Modes"] = ["all"]
         else:
