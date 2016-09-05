@@ -109,7 +109,7 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, isLoggi
                         # Some output methods on this line are not valid output choices.
                         if isLoggingEnabled:
                             LOGGER.warning("Line {:d} contains invalid output methods [{:s}] that will be ignored."
-                                           .format(lineNum + 1, ','.join([i for i in invalidModeChoices])))
+                                           .format(lineNum + 1, ','.join([i for i in invalidOutChoices])))
                         if len(invalidOutChoices) < len(outChoices):
                             # There are valid output methods on this line.
                             fidAnnotateDefinitions.write(">out {:s}\n".format(
