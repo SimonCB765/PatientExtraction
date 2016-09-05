@@ -196,8 +196,11 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, isLoggi
                                                    "number, but the fourth argument is not a valid operator."
                                                    .format(lineNum + 1))
                                 formatError = True
-                            if not chunks[4].isdigit():
+                            try:
                                 # The fifth argument of a five argument value restriction must be a number.
+                                float(chunks[4])
+                            except ValueError:
+                                # The fifth argument was not a number.
                                 if isLoggingEnabled:
                                     LOGGER.warning("Line {:d} is a five argument value restriction beginning with a "
                                                    "number, but the fifth argument is not a number."
@@ -233,11 +236,15 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, isLoggi
                                 LOGGER.warning("Line {:d} is a value restriction beginning with {:s}, but the second "
                                                "argument is not a valid operator.".format(lineNum + 1, chunks[0]))
                             formatError = True
-                        if not chunks[2].isdigit():
+                        try:
                             # The third argument of a value restriction beginning with val1 or val2 must be a number.
+                            float(chunks[2])
+                        except ValueError:
+                            # The third argument was not a number.
                             if isLoggingEnabled:
                                 LOGGER.warning("Line {:d} is a value restriction beginning with {:s}, but the fifth "
                                                "argument is not a number.".format(lineNum + 1, chunks[0]))
+                            formatError = True
                         if not formatError:
                             # The line is correctly formatted, so write it out.
                             line = line.capitalize()  # Convert val1/val2 to Val1/Val2.
