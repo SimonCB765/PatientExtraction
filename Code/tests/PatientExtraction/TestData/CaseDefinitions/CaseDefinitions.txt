@@ -1,0 +1,139 @@
+# Blank Test Case
+
+# Incorrect Definitions Test Case
+`
+¬
+!
+"
+£
+$
+%
+^
+&
+*
+(
+)
+-
+_
+=
++
+[
+{
+]
+}
+;
+:
+'
+@
+~
+\
+|
+,
+<
+.
+>
+/
+?
+
+
+	# Mode Test Case
+ >    MODE	 ALL 	COUNT NA1 NA2 MIN1
+>  	mdoe earliest
+	>  MODE
+
+   # Mode Test Case
+	>  mode LaTeSt OTHERS max2
+>	mode MAX1	 Test2.0
+
+ # Output Test Case
+>out code d a t e median2 value1 TEST1
+	>  OUT
+>  Out  	  max2
+
+# Output Test Case
+>OUT  	 value1 value2
+>   	OUt BADOUTPUT   meDIan1 MEAN2
+
+	# Date Test Case
+> 1900-10-20 to 2000-5-21
+	> 	from 2000-5-5 to 2002-10-10
+>   from 2000-10-10 to 	1990-05-08
+
+  # Date Test Case
+>   FROM 	2000-03-10 to 2010-12-12
+  > from 2005-10-10
+> from 2000-02-29 to	 2001-02-29
+
+	 # Value Test Case
+	>   Val1 	< 5.0
+  	> Val1  	 <=  	 0
+> 	Val1 > 	10
+> VAL1	 >= -10
+> 10 <  	Val1
+> 10  	 <= VAL1
+	>    10 > 	Val1
+> 10 >= Val1
+
+# Value Test Case
+> VaL2 < 	 5.0
+   > Val2  	 <= 0
+>   Val2  > 	 10
+> Val2 >= 	-10
+> 10 < Val2
+>   10	 <= VAl2
+> 10 > 	  val2
+> 	10 >= Val2
+
+# Value Test Case
+> 1.0 <=   VAL1  > 5.0
+>	 1.0 < VaL1 >=  5.0
+> 2.0 >= Val1 < 2.0
+>   2.0   > Val1 <= 2.0
+> -10 <   Val1 	  < 10000
+> -10 <= val1 <=   10000
+>   -10 > Val1 >   10000
+> -10   >=  	  VAl1 >= 10000
+> 1.0 <= Val2   > 5.0
+> 1.0 <   Val2 >=   5.0
+> 2.0 >=    VAL2 <   2.0
+>   2.0 > 	  VaL2 <=   2.0
+> -10   <   VAl2 < 10000
+>   -10    <= val2 <= 10000
+> -10 > 	  Val2   > 10000
+> -10   >= Val2 >=   10000
+
+# Value Test Case
+> Val1 == 10
+> 10 == Val1
+> Val2 == 10
+> 10 == Val2
+> Val1 < Val2
+> Val1 <= Va2
+> Val1 > Val2
+> Val1 >= Val2
+> Val2 < Val1
+> Val2 <= Va1
+> Val2 > Val1
+> Val2 >= Val1
+> 10 > 10
+
+# Code Test Case
+11......%
+-1111%
+
+# Code Test Case
+A%
+-AAA.
+-AAAAA.
+
+# Code Test Case
+B%
+-BB%
+BBB%
+-BBBB
+
+# Code Test Case
+Y%
+Z
+ZZZ
+-ZZZZZ

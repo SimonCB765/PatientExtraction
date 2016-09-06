@@ -1,0 +1,80 @@
+{
+  "Blank_Test_Case": {
+    "Codes": [],
+    "Modes": ["all"],
+    "Outputs": ["count"],
+    "Restrictions": {
+      "Date": [],
+      "Val1": [],
+      "Val2": []
+    }
+  },
+  "Incorrect_Definitions_Test_Case": {
+    "Codes": [],
+    "Modes": ["all"],
+    "Outputs": ["count"],
+    "Restrictions": {
+      "Date": [],
+      "Val1": [],
+      "Val2": []
+    }
+  },
+  "Mode_Test_Case": {
+    "Codes": [],
+    "Modes": ["all", "latest", "max1", "max2", "min1"],
+    "Outputs": ["count"],
+    "Restrictions": {
+      "Date": [],
+      "Val1": [],
+      "Val2": []
+    }
+  },
+  "Output_Test_Case": {
+    "Codes": [],
+    "Modes": ["all"],
+    "Outputs": ["code", "max2", "mean2", "median1", "median2", "value1", "value2"],
+    "Restrictions": {
+      "Date": [],
+      "Val1": [],
+      "Val2": []
+    }
+  },
+  "Date_Test_Case": {
+    "Codes": [],
+    "Modes": ["all"],
+    "Outputs": ["count"],
+    "Restrictions": {
+      "Date": [["2000-5-5", "2002-10-10"], ["2000-03-10", "2010-12-12"], ["2005-10-10"]],
+      "Val1": [],
+      "Val2": []
+    }
+  },
+  "Value_Test_Case": {
+    "Codes": [],
+    "Modes": ["all"],
+    "Outputs": ["count"],
+    "Restrictions": {
+      "Date": [],
+      "Val1": [
+        ["<", 5.0], ["<=", 0], [">", 10], [">=", -10], [">", 10], [">=", 10], ["<", 10], ["<=", 10], [">=", 1.0],
+        [">", 5.0], [">", 1.0], [">=", 5.0], ["<=", 2.0], ["<", 2.0], ["<", 2.0], ["<=", 2.0], [">", -10],
+        ["<", 10000], [">=", -10], ["<=", 10000], ["<", -10], [">", 10000], ["<=", -10], [">=", 10000]
+    ],
+      "Val2": [
+        ["<", 5.0], ["<=", 0], [">", 10], [">=", -10], [">", 10], [">=", 10], ["<", 10], ["<=", 10], [">=", 1.0],
+        [">", 5.0], [">", 1.0], [">=", 5.0], ["<=", 2.0], ["<", 2.0], ["<", 2.0], ["<=", 2.0], [">", -10],
+        ["<", 10000], [">=", -10], ["<=", 10000], ["<", -10], [">", 10000], ["<=", -10], [">=", 10000]
+      ]
+    }
+  },
+  "Code_Test_Case": {
+    "Codes": ["11", "111", "A", "AA", "AAAA", "B", "Y", "Z", "ZZZ"],
+    "Modes": ["all"],
+    "Outputs": ["count"],
+    "Restrictions": {
+      "Date": [],
+      "Val1": [],
+      "Val2": []
+    }
+  }
+}

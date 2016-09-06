@@ -1,0 +1,85 @@
+# Blank Test Case
+# Incorrect Definitions Test Case
+# Mode Test Case
+>mode all min1
+>mode
+# Mode Test Case
+>mode latest max2
+>mode max1
+# Output Test Case
+>out code median2 value1
+>out
+>out max2
+# Output Test Case
+>out value1 value2
+>out median1 mean2
+# Date Test Case
+>from 2000-5-5 to 2002-10-10
+# Date Test Case
+>from 2000-03-10 to 2010-12-12
+>from 2005-10-10
+# Value Test Case
+>Val1 < 5.0
+>Val1 <= 0
+>Val1 > 10
+>Val1 >= -10
+>Val1 > 10
+>Val1 >= 10
+>Val1 < 10
+>Val1 <= 10
+# Value Test Case
+>Val2 < 5.0
+>Val2 <= 0
+>Val2 > 10
+>Val2 >= -10
+>Val2 > 10
+>Val2 >= 10
+>Val2 < 10
+>Val2 <= 10
+# Value Test Case
+>Val1 >= 1.0
+>Val1 > 5.0
+>Val1 > 1.0
+>Val1 >= 5.0
+>Val1 <= 2.0
+>Val1 < 2.0
+>Val1 < 2.0
+>Val1 <= 2.0
+>Val1 > -10
+>Val1 < 10000
+>Val1 >= -10
+>Val1 <= 10000
+>Val1 < -10
+>Val1 > 10000
+>Val1 <= -10
+>Val1 >= 10000
+>Val2 >= 1.0
+>Val2 > 5.0
+>Val2 > 1.0
+>Val2 >= 5.0
+>Val2 <= 2.0
+>Val2 < 2.0
+>Val2 < 2.0
+>Val2 <= 2.0
+>Val2 > -10
+>Val2 < 10000
+>Val2 >= -10
+>Val2 <= 10000
+>Val2 < -10
+>Val2 > 10000
+>Val2 <= -10
+>Val2 >= 10000
+# Value Test Case
+# Code Test Case
+11...	Code 11
+111..	Code 111
+# Code Test Case
+A....	Code A
+AA...	Code AA
+AAAA.	Code AAAA
+# Code Test Case
+B....	Code B
+# Code Test Case
+Y....	Code not recognised
+Z....	Code not recognised
+ZZZ..	Code not recognised
