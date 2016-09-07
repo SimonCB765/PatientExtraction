@@ -45,10 +45,10 @@ def main(fileCaseDefs, dirOutput, filePatientData, fileCodeDescriptions):
         header = "PatientID\t{:s}\n".format(extractions)
         fidExtraction.write(header)
 
-        # Extract the data for each patient, one per line.
+        # Extract the data for each patient.
         for line in fidPatientData:
             chunks = (line.strip()).split('\t')
-            patientID = chunks[0]
+            patientID = chunks[0]  # The ID of the patient whose record appears on the line.
             patientRecord = json.loads(chunks[1])  # The patient's medical history in JSON format.
             extractedHistory = {}  # The subset of the patient's medical history to be extracted and output.
 
@@ -60,16 +60,17 @@ def main(fileCaseDefs, dirOutput, filePatientData, fileCodeDescriptions):
             # Select the portion of the patient's record (i.e. code associations) meeting the requirements for each
             # case definition.
             for i in caseNames:
-                # Select associations involving the positive indicator codes.
+                # Select the patient's associations that involve a positive indicator code.
                 caseSubset = {i: patientRecord[i] for i in caseDefinitions[i]["Codes"] if i in patientRecord}
-                # Apply the restrictions to the positive indicator code associations.
+                # Apply the restrictions for this case to the patient's associations with positive indicator codes
+                # in order to remove associations that can not indicate that the case applies to the patient.
                 caseSubset = apply_restrictions(caseSubset, caseDefinitions[i]["Restrictions"])
-                # Extract the subset of this restricted set of associations that the user desires (based on the modes).
                 if not caseSubset:
-                    # If there are no associations remaining, then return empty dictionaries for each mode.
+                    # If there are no associations remaining, then return an empty dictionary for each mode.
                     extractedHistory[i] = {j: {} for j in conf.validChoices["Modes"]}
                 else:
-                    # Select the associations needed according the modes.
+                    # Associations remain, so the case applies to the patient. Therefore, extract the subset of the
+                    # restricted set of associations that the user desires (according to modes specified for the case).
                     extractedHistory[i] = select_associations(caseSubset, caseDefinitions[i]["Modes"])
 
             # Generate and record the output for the patient.
