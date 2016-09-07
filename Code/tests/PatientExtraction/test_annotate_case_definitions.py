@@ -33,6 +33,7 @@ class TestAnnotateCaseDefinitions(unittest.TestCase):
 
         # Load the case definitions.
         fileCaseDefinitions = os.path.join(dirData, "TempData", "TempAnnotations.txt")
+        os.makedirs(os.path.join(dirData, "TempData"), exist_ok=True)
         annotate_case_definitions.main(fileData, fileCodeDescriptions, fileCaseDefinitions, isLoggingEnabled=False)
         fidCaseDefs = open(fileCaseDefinitions, 'r')
         cls.annotatedCaseDefs = fidCaseDefs.read()
