@@ -271,7 +271,7 @@ def value_outputter(valType):
 
         # Get an arbitrary value associated with the code. As records are sorted chronologically, this will get the
         # value associated with the earliest association in the record between the code and the patient.
-        value = record[code][0]["Val1"]
+        value = record[code][0][valType]
         return "{:.2f}".format(value)
 
     return outputter
