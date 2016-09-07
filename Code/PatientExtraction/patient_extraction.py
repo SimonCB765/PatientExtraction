@@ -78,37 +78,37 @@ def main(fileCaseDefs, dirOutput, filePatientData, fileCodeDescriptions):
             fidExtraction.write("{:s}\t{:s}\n".format(patientID, generatedOutput))
 
 
-def apply_restrictions(medicalRecord, conditionRestrictions):
+def apply_restrictions(medicalRecord, caseRestrictions):
     """Remove associations from a patient's medical history not meeting the restriction criteria for a case definition.
 
-    :param medicalRecord:           A patient's medical record. This should have the format:
-                                        {
-                                            "Code1": [
-                                                {"Val1": 0, "Val2": 0, "Date": datetime, "Text": ""},
-                                                {"Val1": 0, "Val2": 0, "Date": datetime, "Text": ""}
-                                            ],
-                                            "Code2": [{"Val1": 0, "Val2": 0, "Date": datetime, "Text": ""}],
-                                            "Code3": [
-                                                {"Val1": 0, "Val2": 0, "Date": datetime, "Text": ""},
-                                                {"Val1": 0, "Val2": 0, "Date": datetime, "Text": ""}
-                                            ]
-                                        }
-    :type medicalRecord:            dict
-    :param conditionRestrictions:   The data about the condition restrictions. This has the format:
-                                        {"Date": [], "Val1": [], "Val2": []}
-                                        where each list contains functions that apply the restrictions of the given
-                                        type (i.e. the "Date" list contains functions to implement the date-based
-                                        restrictions).
-    :type conditionRestrictions     dict
-    :return:                        The restricted patient's medical history in the same format as the input history.
-    :rtype:                         dict
+    :param medicalRecord:       A patient's medical record. This should have the format:
+                                    {
+                                        "Code1": [
+                                            {"Val1": 0, "Val2": 0, "Date": datetime, "Text": ""},
+                                            {"Val1": 0, "Val2": 0, "Date": datetime, "Text": ""}
+                                        ],
+                                        "Code2": [{"Val1": 0, "Val2": 0, "Date": datetime, "Text": ""}],
+                                        "Code3": [
+                                            {"Val1": 0, "Val2": 0, "Date": datetime, "Text": ""},
+                                            {"Val1": 0, "Val2": 0, "Date": datetime, "Text": ""}
+                                        ]
+                                    }
+    :type medicalRecord:        dict
+    :param caseRestrictions:    The data about the case's restrictions. This has the format:
+                                    {"Date": [], "Val1": [], "Val2": []}
+                                    where each list contains functions that apply the restrictions of the given
+                                    type (i.e. the "Date" list contains functions to implement the date-based
+                                    restrictions).
+    :type caseRestrictions:     dict
+    :return:                    The restricted patient's medical history in the same format as the input history.
+    :rtype:                     dict
 
     """
 
     # Remove associations that do not meet the restriction criteria.
-    for i in conditionRestrictions:
+    for i in caseRestrictions:
         # Go through each category of restrictions (values, dates, etc.).
-        for j in conditionRestrictions[i]:
+        for j in caseRestrictions[i]:
             # Filter the patient's record by the current restriction, leaving only those associations
             # that meet the current restriction.
             medicalRecord = {k: [l for l in medicalRecord[k] if j(l[i])] for k in medicalRecord}
@@ -179,7 +179,7 @@ def generate_patient_output(extractedHistory, caseNames, caseDefinitions):
                     # Add blanks for each column associated with this mode, as using it we didn't get any association.
                     generatedOutput.extend(['' for _ in caseDefinitions[i]["Outputs"]])
         else:
-            # Add blanks for each column if the patient doesn't have the condition.
+            # Add blanks for each column if the case does not apply to the patient.
             generatedOutput.extend(
                 ['' for _ in caseDefinitions[i]["Modes"] for _ in caseDefinitions[i]["Outputs"]]
             )
