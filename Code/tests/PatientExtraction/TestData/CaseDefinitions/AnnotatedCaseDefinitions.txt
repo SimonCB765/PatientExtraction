@@ -29,11 +29,11 @@ DD...	Code DD
 >mode latest max2
 >mode max1
 # Output Test Case
->out code median2 value1
+>out code median2 val1
 >out
 >out max2
 # Output Test Case
->out value1 value2
+>out val1 val2
 >out median1 mean2
 # Date Test Case
 >from 2000-5-5 to 2002-10-10

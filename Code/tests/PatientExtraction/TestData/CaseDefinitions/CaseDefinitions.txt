@@ -46,12 +46,12 @@ _
 >	mode MAX1	 Test2.0
 
  # Output Test Case
->out code d a t e median2 value1 TEST1
+>out code d a t e median2 val1 TEST1
 	>  OUT
 >  Out  	  max2
 
 # Output Test Case
->OUT  	 value1 value2
+>OUT  	 val1 val2
 >   	OUt BADOUTPUT   meDIan1 MEAN2
 
 	# Date Test Case

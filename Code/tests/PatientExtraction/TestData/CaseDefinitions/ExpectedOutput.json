@@ -35,7 +35,7 @@
   "Output_Test_Case": {
     "Codes": [],
     "Modes": ["all"],
-    "Outputs": ["code", "max2", "mean2", "median1", "median2", "value1", "value2"],
+    "Outputs": ["code", "max2", "mean2", "median1", "median2", "val1", "val2"],
     "Restrictions": {
       "Date": [],
       "Val1": [],
