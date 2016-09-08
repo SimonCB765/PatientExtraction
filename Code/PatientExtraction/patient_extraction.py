@@ -3,6 +3,7 @@
 # Python imports.
 import datetime
 import json
+import logging
 import os
 
 # User imports.
@@ -10,8 +11,11 @@ from . import annotate_case_definitions
 from . import conf
 from . import parse_case_definitions
 
+# Globals.
+LOGGER = logging.getLogger(__name__)
 
-def main(fileCaseDefs, dirOutput, filePatientData, fileCodeDescriptions):
+
+def main(fileCaseDefs, dirOutput, filePatientData, fileCodeDescriptions, filePatientSubset):
     """Run the patient extraction.
 
     :param fileCaseDefs:            The location of the input file containing the case definitions.
@@ -22,6 +26,9 @@ def main(fileCaseDefs, dirOutput, filePatientData, fileCodeDescriptions):
     :type filePatientData:          str
     :param fileCodeDescriptions:    The location of the file containing the mapping from codes to their descriptions.
     :type fileCodeDescriptions:     str
+    :param filePatientSubset:       The location of the file containing the IDs of the subset of patients to use
+                                        in the extraction.
+    :type filePatientSubset:        str
 
     """
 
@@ -33,6 +40,13 @@ def main(fileCaseDefs, dirOutput, filePatientData, fileCodeDescriptions):
 
     # Extract the case definitions from the file of case definitions.
     caseDefinitions, caseNames = parse_case_definitions.main(fileAnnotatedCaseDefs)
+
+    # Identify the patient to restrict the extraction to.
+    patientExtractionSubset = set()
+    with open(filePatientSubset, 'r') as fidPatientSubset:
+        for line in fidPatientSubset:
+            line = line.strip()
+            patientExtractionSubset.add(line)
 
     # Extract the patient data.
     fileExtractIon = os.path.join(dirOutput, "DataExtraction.tsv")
@@ -49,6 +63,9 @@ def main(fileCaseDefs, dirOutput, filePatientData, fileCodeDescriptions):
         for line in fidPatientData:
             chunks = (line.strip()).split('\t')
             patientID = chunks[0]  # The ID of the patient whose record appears on the line.
+            if patientExtractionSubset and patientID not in patientExtractionSubset:
+                # Skip this patient if they aren't in the extraction subset (and the extraction subset is being used).
+                continue
             patientRecord = json.loads(chunks[1])  # The patient's medical history in JSON format.
             extractedHistory = {}  # The subset of the patient's medical history to be extracted and output.
 

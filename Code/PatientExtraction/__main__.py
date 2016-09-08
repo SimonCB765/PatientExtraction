@@ -44,6 +44,10 @@ parser.add_argument("-o", "--output",
                     help="The location of the directory to write the output files to. Default: a timestamped "
                          "subdirectory in the Results directory.",
                     type=str)
+parser.add_argument("-p", "--patient",
+                    help="The location of the file containing the IDs' of the patients that the extraction should be "
+                         "restricted to. Default: a file PatientSubset.txt in the Data directory.",
+                    type=str)
 parser.add_argument("-w", "--overwrite",
                     action="store_true",
                     help="Whether the output directory should be overwritten if it exists. Default: do not overwrite.")
@@ -92,6 +96,12 @@ filePatientData = args.histories if args.histories else filePatientData
 if not os.path.isfile(filePatientData):
     errorsFound.append("The file containing the patient data could not be found.")
 
+# Validate the file containing the patient subset to use.
+filePatientSubset = os.path.join(dirData, "PatientSubset.txt")
+filePatientSubset = args.patient if args.patient else filePatientSubset
+if not os.path.isfile(filePatientSubset):
+    errorsFound.append("The location containing the subset of patients to use is not a file.")
+
 # Display errors if any were found.
 if errorsFound:
     print("\n\nThe following errors were encountered while parsing the input arguments:\n")
@@ -136,4 +146,4 @@ logger.addHandler(logConsoleHandler)
 # ============================== #
 logger.info("Starting patient extraction.")
 conf.init()  # Initialise the settings-like global variables.
-patient_extraction.main(fileInput, dirOutput, filePatientData, fileCodeDescriptions)
+patient_extraction.main(fileInput, dirOutput, filePatientData, fileCodeDescriptions, filePatientSubset)
