@@ -36,13 +36,13 @@ parser.add_argument("-c", "--coding",
                     help="The location of the file containing the mapping from codes to their descriptions. Default: "
                          "a file Coding.tsv in the Data directory",
                     type=str)
+parser.add_argument("-d", "--histories",
+                    help="The location of the file containing the patient medical history data in flat file format. "
+                         "Default: a file FlatPatientData.tsv in the Data directory.",
+                    type=str)
 parser.add_argument("-o", "--output",
                     help="The location of the directory to write the output files to. Default: a timestamped "
                          "subdirectory in the Results directory.",
-                    type=str)
-parser.add_argument("-p", "--patient",
-                    help="The location of the file containing the patient medical history data in flat file format. "
-                         "Default: a file FlatPatientData.tsv in the Data directory.",
                     type=str)
 parser.add_argument("-w", "--overwrite",
                     action="store_true",
@@ -65,7 +65,7 @@ if not os.path.isfile(fileInput):
 
 # Validate the location of the code mapping file.
 fileCodeDescriptions = os.path.join(dirData, "Coding.tsv")
-fileCodeDescriptions = args.patient if args.coding else fileCodeDescriptions
+fileCodeDescriptions = args.coding if args.coding else fileCodeDescriptions
 if not os.path.isfile(fileCodeDescriptions):
     errorsFound.append("The file containing the code to description mappings could not be found.")
 
@@ -88,7 +88,7 @@ elif os.path.exists(dirOutput):
 
 # Validate the patient medical history data file.
 filePatientData = os.path.join(dirData, "FlatPatientData.tsv")
-filePatientData = args.patient if args.coding else filePatientData
+filePatientData = args.histories if args.histories else filePatientData
 if not os.path.isfile(filePatientData):
     errorsFound.append("The file containing the patient data could not be found.")
 
