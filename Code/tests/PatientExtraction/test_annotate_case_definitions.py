@@ -23,6 +23,7 @@ class TestAnnotateCaseDefinitions(unittest.TestCase):
 
         # Setup global settings-like variables.
         conf.init()
+        conf.control_logging(False)  # Turn logging off.
 
         # Determine the files needed to load the data and the expected results of the tests.
         dirCurrent = os.path.dirname(os.path.join(os.getcwd(), __file__))  # Directory containing this file.
@@ -34,7 +35,7 @@ class TestAnnotateCaseDefinitions(unittest.TestCase):
         # Load the case definitions.
         fileCaseDefinitions = os.path.join(dirData, "TempData", "TempAnnotations.txt")
         os.makedirs(os.path.join(dirData, "TempData"), exist_ok=True)
-        annotate_case_definitions.main(fileData, fileCodeDescriptions, fileCaseDefinitions, isLoggingEnabled=False)
+        annotate_case_definitions.main(fileData, fileCodeDescriptions, fileCaseDefinitions)
         fidCaseDefs = open(fileCaseDefinitions, 'r')
         cls.annotatedCaseDefs = fidCaseDefs.read()
         fidCaseDefs.close()

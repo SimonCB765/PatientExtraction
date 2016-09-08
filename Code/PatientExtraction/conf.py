@@ -8,6 +8,7 @@ from . import record_outputter
 from . import record_selector
 
 # Global variables provided.
+isLogging = True
 validChoices = {}  # The valid modes, outputs and operators that can appear in a case definition file.
 
 
@@ -31,3 +32,9 @@ def init(args=None):
     global validChoices
     validChoices = {"Modes": validModes, "Operators": validOperators, "Outputs": validOutputs}
 
+
+def control_logging(isOn=True):
+    """Turn the logging on or off."""
+
+    global isLogging
+    isLogging = isOn

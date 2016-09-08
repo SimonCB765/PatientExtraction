@@ -100,7 +100,8 @@ def main(fileCaseDefs):
                     caseDefinitions[currentCaseDef]["Restrictions"][chunks[0]].append(comparisonFunc)
                 else:
                     # The line was not correctly formatted, and will be ignored.
-                    LOGGER.warning("Line {:d} contains an incorrectly formatted control line.".format(lineNum + 1))
+                    if conf.isLogging:
+                        LOGGER.warning("Line {:d} contains an incorrectly formatted control line.".format(lineNum + 1))
             else:
                 # Found a code for the current case definition.
                 line = line.replace('.', '')

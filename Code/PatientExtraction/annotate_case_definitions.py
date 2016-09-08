@@ -12,7 +12,7 @@ from . import conf
 LOGGER = logging.getLogger(__name__)
 
 
-def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, isLoggingEnabled=True):
+def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions):
     """Annotate a file of case definitions by expanding all defining codes.
 
     :param fileDefinitions:         The location of the file containing the case definitions.
@@ -21,8 +21,6 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, isLoggi
     :type fileCodeDescriptions:     str
     :param fileAnnotateDefinitions: The location of the file to write the annotated input file to.
     :type fileAnnotateDefinitions:  str
-    :param isLoggingEnabled:        Whether logging should be performed.
-    :type isLoggingEnabled:         bool
 
     """
 
@@ -54,7 +52,7 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, isLoggi
                     caseDefCodes = currentCaseCodes["Positive"] - currentCaseCodes["Negative"]
                     for i in sorted(caseDefCodes):
                         description = mapCodeToDescription.get(i, "Code not recognised")
-                        if description == "Code not recognised" and isLoggingEnabled:
+                        if description == "Code not recognised" and conf.isLogging:
                             LOGGER.warning("Code {:s} was not found in the dictionary.".format(i))
                         fidAnnotateDefinitions.write("{:.<5}\t{:s}\n".format(i, description))
                 currentCaseCodes = {"Negative": set([]), "Positive": set([])}
@@ -73,7 +71,7 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, isLoggi
                 isFirstElemNumeric = False
                 if len(chunks) == 0:
                     # The control line needs more information on it, so skip the rest of the chekcing of the line.
-                    if isLoggingEnabled:
+                    if conf.isLogging:
                         LOGGER.warning("Line {:d} contains no control information.".format(lineNum + 1))
                     continue
                 else:
@@ -91,7 +89,7 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, isLoggi
                     invalidModeChoices = [i for i in modeChoices if i not in conf.validChoices["Modes"]]
                     if invalidModeChoices:
                         # Some modes on this line are not valid mode choices.
-                        if isLoggingEnabled:
+                        if conf.isLogging:
                             LOGGER.warning("Line {:d} contains invalid modes [{:s}] that will be ignored."
                                            .format(lineNum + 1, ','.join([i for i in invalidModeChoices])))
                         if len(invalidModeChoices) < len(modeChoices):
@@ -107,7 +105,7 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, isLoggi
                     invalidOutChoices = [i for i in outChoices if i not in conf.validChoices["Outputs"]]
                     if invalidOutChoices:
                         # Some output methods on this line are not valid output choices.
-                        if isLoggingEnabled:
+                        if conf.isLogging:
                             LOGGER.warning("Line {:d} contains invalid output methods [{:s}] that will be ignored."
                                            .format(lineNum + 1, ','.join([i for i in invalidOutChoices])))
                         if len(invalidOutChoices) < len(outChoices):
@@ -130,7 +128,7 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, isLoggi
                             fidAnnotateDefinitions.write(">{:s}\n".format(line))
                         except ValueError:
                             # The line is incorrectly formatted as the second argument failed to be parsed as a date.
-                            if isLoggingEnabled:
+                            if conf.isLogging:
                                 LOGGER.warning("Line {:d} is a two argument date restriction, but the second "
                                                "argument is {:s} when it should be a YYYY-MM-DD formatted date."
                                                .format(lineNum + 1, chunks[1]))
@@ -139,7 +137,7 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, isLoggi
                         # format, the third 'to' and the fourth a date in YYYY-MM-DD format.
                         if chunks[2] != "to":
                             # With four arguments the format must be "from date to date".
-                            if isLoggingEnabled:
+                            if conf.isLogging:
                                 LOGGER.warning("Line {:d} has 4 arguments, but the third argument is not 'to'"
                                                .format(lineNum + 1))
                         else:
@@ -149,7 +147,7 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, isLoggi
                                 endDate = datetime.datetime.strptime(chunks[3], "%Y-%m-%d")
                                 if endDate < startDate:
                                     # The end date of the date restriction is before the start date.
-                                    if isLoggingEnabled:
+                                    if conf.isLogging:
                                         LOGGER.warning("Line {:d} date restriction has an end date '{:s}' before its "
                                                        "start date '{:s}'.".format(lineNum + 1, chunks[1], chunks[3]))
                                 else:
@@ -158,14 +156,14 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, isLoggi
                             except ValueError:
                                 # The line is incorrectly formatted as the second or fourth argument failed to be
                                 # parsed as a date.
-                                if isLoggingEnabled:
+                                if conf.isLogging:
                                     LOGGER.warning("Line {:d} is a four argument date restriction. The second and "
                                                    "fourth arguments should be YYYY-MM-DD formatted dates, but were "
                                                    "{:s} and {:s} respectively.".format(lineNum + 1, chunks[1],
                                                                                         chunks[3]))
                     else:
                         # There is an incorrect number of arguments on the line.
-                        if isLoggingEnabled:
+                        if conf.isLogging:
                             LOGGER.warning("Line {:d} contains {:d} arguments but date restrictions need 2 or 4."
                                            .format(lineNum + 1, len(chunks)))
                 elif isFirstElemNumeric:
@@ -176,14 +174,14 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, isLoggi
                         if chunks[1] not in conf.validChoices["Operators"]:
                             # The second argument for a value restriction beginning with a number must be a valid
                             # operator.
-                            if isLoggingEnabled:
+                            if conf.isLogging:
                                 LOGGER.warning("Line {:d} is a value restriction beginning with a number, but the"
                                                "second argument is not a valid operator.".format(lineNum + 1))
                             formatError = True
                         if chunks[2] not in ["val1", "val2"]:
                             # The third argument for a value restriction beginning with a number must be the name
                             # of the value to restrict on.
-                            if isLoggingEnabled:
+                            if conf.isLogging:
                                 LOGGER.warning("Line {:d} is a value restriction beginning with a number, but the"
                                                "second argument is not a valid operator.".format(lineNum + 1))
                             formatError = True
@@ -191,7 +189,7 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, isLoggi
                             # There are five arguments on the line, so the format should be # OP val1/val2 OP #.
                             if chunks[3] not in conf.validChoices["Operators"]:
                                 # The fourth argument of a five argument value restriction must be a valid operator.
-                                if isLoggingEnabled:
+                                if conf.isLogging:
                                     LOGGER.warning("Line {:d} is a five argument value restriction beginning with a "
                                                    "number, but the fourth argument is not a valid operator."
                                                    .format(lineNum + 1))
@@ -201,7 +199,7 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, isLoggi
                                 float(chunks[4])
                             except ValueError:
                                 # The fifth argument was not a number.
-                                if isLoggingEnabled:
+                                if conf.isLogging:
                                     LOGGER.warning("Line {:d} is a five argument value restriction beginning with a "
                                                    "number, but the fifth argument is not a number."
                                                    .format(lineNum + 1))
@@ -221,7 +219,7 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, isLoggi
                                 fidAnnotateDefinitions.write(">{:s}\n".format(' '.join(chunks[2:])))
                     else:
                         # There is an incorrect number of arguments on the line.
-                        if isLoggingEnabled:
+                        if conf.isLogging:
                             LOGGER.warning("Line {:d} contains {:d} values but value restrictions starting with a "
                                            "number should have 3 or 5.".format(lineNum + 1, len(chunks)))
                 elif chunks[0] in ["val1", "val2"]:
@@ -232,7 +230,7 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, isLoggi
                         if chunks[1] not in conf.validChoices["Operators"]:
                             # The second argument for a value restriction beginning with val1 or val2 must be a valid
                             # operator.
-                            if isLoggingEnabled:
+                            if conf.isLogging:
                                 LOGGER.warning("Line {:d} is a value restriction beginning with {:s}, but the second "
                                                "argument is not a valid operator.".format(lineNum + 1, chunks[0]))
                             formatError = True
@@ -241,7 +239,7 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, isLoggi
                             float(chunks[2])
                         except ValueError:
                             # The third argument was not a number.
-                            if isLoggingEnabled:
+                            if conf.isLogging:
                                 LOGGER.warning("Line {:d} is a value restriction beginning with {:s}, but the fifth "
                                                "argument is not a number.".format(lineNum + 1, chunks[0]))
                             formatError = True
@@ -251,12 +249,12 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, isLoggi
                             fidAnnotateDefinitions.write(">{:s}\n".format(line))
                     else:
                         # There is an incorrect number of arguments on the line.
-                        if isLoggingEnabled:
+                        if conf.isLogging:
                             LOGGER.warning("Line {:d} contains {:d} values but value restrictions starting with val1 "
                                            "or val2 should have 3.".format(lineNum + 1, len(chunks)))
                 else:
                     # The control line starts with an incorrect value.
-                    if isLoggingEnabled:
+                    if conf.isLogging:
                         LOGGER.warning("The first argument on line {:d} was '{:s}', but should have been a number or "
                                        "one of mode, out, from, val1 or val2.".format(lineNum + 1, chunks[0]))
             elif codeMatcher.match(line):
@@ -283,7 +281,7 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, isLoggi
                 currentCaseCodes[codeType].add(code)
             else:
                 # The line does not appear to contain valid information, so log this and skip it.
-                if isLoggingEnabled:
+                if conf.isLogging:
                     LOGGER.warning("Line {:d} contains a non-blank line that could not be processed."
                                    .format(lineNum + 1))
 
@@ -291,6 +289,6 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, isLoggi
         caseDefCodes = currentCaseCodes["Positive"] - currentCaseCodes["Negative"]
         for i in sorted(caseDefCodes):
             description = mapCodeToDescription.get(i, "Code not recognised")
-            if description == "Code not recognised" and isLoggingEnabled:
+            if description == "Code not recognised" and conf.isLogging:
                 LOGGER.warning("Code {:s} was not found in the dictionary.".format(i))
             fidAnnotateDefinitions.write("{:.<5}\t{:s}\n".format(i, description))
