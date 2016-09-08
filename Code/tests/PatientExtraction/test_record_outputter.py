@@ -26,7 +26,7 @@ class TestRestrictionApplication(unittest.TestCase):
         # Determine the files needed to load the data and the expected results of the tests.
         dirCurrent = os.path.dirname(os.path.join(os.getcwd(), __file__))  # Directory containing this file.
         dirData = os.path.abspath(os.path.join(dirCurrent, "TestData"))
-        filePatientData = os.path.join(dirData, "FlatPatientData.tsv")
+        filePatientData = os.path.join(dirData, "RecordOutputter", "FlatPatientData.tsv")
         fileOutputChoices = os.path.join(dirData, "RecordOutputter", "OutputChoices.json")
         fileExpectedOutput = os.path.join(dirData, "RecordOutputter", "ExpectedOutput.json")
 
