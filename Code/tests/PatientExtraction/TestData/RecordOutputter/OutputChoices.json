@@ -1,0 +1,17 @@
+{
+  "1": [
+    "code", "count", "date", "max1", "max2", "mean1", "mean2", "median1", "median2", "min1", "min2", "value1", "value2"
+  ],
+  "2": [
+    "count", "max1", "max2", "mean1", "mean2", "median1", "median2", "min1", "min2"
+  ],
+  "3": [
+    "count", "max1", "max2", "mean1", "mean2", "median1", "median2", "min1", "min2"
+  ],
+  "4": [
+    "code", "date", "value1", "value2"
+  ],
+  "5": [
+    "code", "date", "value1", "value2"
+  ]
+}
