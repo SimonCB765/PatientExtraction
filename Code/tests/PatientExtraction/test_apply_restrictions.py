@@ -1,4 +1,4 @@
-"""Tests for the record_selector module."""
+"""Tests for the apply_restrictions function in the patient_extraction module."""
 
 # Python imports.
 import datetime

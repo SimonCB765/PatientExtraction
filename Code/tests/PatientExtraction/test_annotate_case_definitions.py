@@ -1,4 +1,4 @@
-"""Tests for the record_selector module."""
+"""Tests for the annotate_case_definition module."""
 
 # Python imports.
 import os

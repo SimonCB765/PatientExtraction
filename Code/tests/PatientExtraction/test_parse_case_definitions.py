@@ -1,4 +1,4 @@
-"""Tests for the record_selector module."""
+"""Tests for the parse_case_definitions module."""
 
 # Python imports.
 import datetime

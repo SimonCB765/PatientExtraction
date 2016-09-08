@@ -1,4 +1,4 @@
-"""Tests for the record_selector module."""
+"""Tests for the record_outputter module."""
 
 # Python imports.
 import datetime
