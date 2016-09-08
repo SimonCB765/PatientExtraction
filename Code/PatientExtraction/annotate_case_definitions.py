@@ -37,7 +37,7 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions):
     # ============================= #
     # Annotate the Case Definitions #
     # ============================= #
-    codeMatcher = re.compile("^-?[a-zA-Z0-9]")  # Regular expression to identify correctly formatted codes.
+    codeMatcher = re.compile("^-?[a-zA-Z0-9%]")  # Regular expression to identify correctly formatted codes.
     currentCaseCodes = {"Negative": set([]), "Positive": set([])}
     with open(fileDefinitions, 'r') as fidDefinitions, open(fileAnnotateDefinitions, 'w') as fidAnnotateDefinitions:
         for lineNum, line in enumerate(fidDefinitions):
@@ -269,16 +269,20 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions):
                     code = code[1:]
 
                 # Determine if the code needs expanding to include child codes.
+                codeList = []
                 if code[-1] == '%':
-                    # Found a code that needs expanding to include child codes. If the code can not be found in the
-                    # code to description mapping, then only the code itself will be added to the list of indicator
-                    # codes for the case.
+                    # Found a code that needs expanding to include child codes.
                     code = code[:-1]
                     codeList = [i for i in mapCodeToDescription if i[:len(code)] == code]
+                if codeList:
+                    # The code had a % at the end and had matching codes found in the code to description mapping.
                     for i in codeList:
                         currentCaseCodes[codeType].add(i)
-                # Make sure the code itself is added to the list.
-                currentCaseCodes[codeType].add(code)
+                else:
+                    # The code either did not have a % at the end or did but had no matching codes in the code to
+                    # description mapping. In either case, add the code itself to the list of indicator codes for the
+                    # case.
+                    currentCaseCodes[codeType].add(code)
             else:
                 # The line does not appear to contain valid information, so log this and skip it.
                 if conf.isLogging:

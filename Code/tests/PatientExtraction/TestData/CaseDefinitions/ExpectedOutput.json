@@ -9,8 +9,11 @@
       "Val2": []
     }
   },
-  "Incorrect_Definitions_Test_Case": {
-    "Codes": [],
+  "Entire_Code_List": {
+    "Codes": [
+      "1", "11", "111", "1111", "11111", "A", "AA", "AAA", "AAAA", "AAAAA", "B", "BB", "BBB", "BBBB", "BBBBB", "C",
+      "CC", "CCC", "CCCC", "CCCCC", "D", "DD"
+    ],
     "Modes": ["all"],
     "Outputs": ["count"],
     "Restrictions": {
