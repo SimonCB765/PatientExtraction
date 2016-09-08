@@ -39,7 +39,7 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions, isLoggi
     # ============================= #
     # Annotate the Case Definitions #
     # ============================= #
-    codeMatcher = re.compile("^-?[a-zA-Z0-9]+\.*%?$")  # Regular expression to identify correctly formatted codes.
+    codeMatcher = re.compile("^-?[a-zA-Z0-9]")  # Regular expression to identify correctly formatted codes.
     currentCaseCodes = {"Negative": set([]), "Positive": set([])}
     with open(fileDefinitions, 'r') as fidDefinitions, open(fileAnnotateDefinitions, 'w') as fidAnnotateDefinitions:
         for lineNum, line in enumerate(fidDefinitions):
