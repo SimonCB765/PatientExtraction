@@ -50,7 +50,7 @@ def earliest_selector(records):
 
     # First find the code that has the earliest association with the patient. This will return not just
     # the earliest association, but all associations between the patient and the earliest occurring code.
-    earliestRecord = min(records.items(), key=lambda x: x[1][0]["Date"])
+    earliestRecord = min(records.items(), key=lambda x: (x[1][0]["Date"], x[0]))
 
     # Determine the code that occurred earliest, and its association with the patient that caused it to be
     # the earliest occurring code. Due to the way associations are stored (chronologically) the first
@@ -80,7 +80,7 @@ def latest_selector(records):
 
     # First find the code that has the latest association with the patient. This will return not just
     # the latest association, but all associations between the patient and the latest occurring code.
-    latestRecord = max(records.items(), key=lambda x: x[1][-1]["Date"])
+    latestRecord = max(records.items(), key=lambda x: (x[1][-1]["Date"], x[0]))
 
     # Determine the code that occurred latest, and its association with the patient that caused it to be
     # the latest occurring code. Due to the way associations are stored (chronologically) the last
@@ -114,7 +114,7 @@ def max_selector(valType):
 
         # Select the positive indicator code that has an association with the patient that contains the
         # greatest valType value.
-        maxRecord = max(records.items(), key=lambda x: max([i[valType] for i in x[1]]))
+        maxRecord = max(records.items(), key=lambda x: (max([i[valType] for i in x[1]]), x[0]))
 
         # Determine the code associated with the max value and its association with the patient that actually has
         # the maximum value.
@@ -149,7 +149,7 @@ def min_selector(valType):
 
         # Select the positive indicator code that has an association with the patient that contains the
         # smallest valType value.
-        minRecord = min(records.items(), key=lambda x: min([i[valType] for i in x[1]]))
+        minRecord = min(records.items(), key=lambda x: (min([i[valType] for i in x[1]]), x[0]))
 
         # Determine the code associated with the min value and its association with the patient that actually has
         # the minimum value.
