@@ -86,9 +86,9 @@ if overwrite:
         pass
     except Exception as e:
         # Can't remove the directory for another reason.
-        errorsFound.append("Could not overwrite the default output directory location - {0:s}".format(str(e)))
+        errorsFound.append("Could not overwrite the output directory location - {0:s}".format(str(e)))
 elif os.path.exists(dirOutput):
-    errorsFound.append("The default output directory location already exists and overwriting is not enabled.")
+    errorsFound.append("The output directory location already exists and overwriting is not enabled.")
 
 # Validate the patient medical history data file.
 filePatientData = os.path.join(dirData, "FlatPatientData.tsv")
