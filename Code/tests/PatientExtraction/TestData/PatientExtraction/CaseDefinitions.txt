@@ -1,0 +1,64 @@
+# Empty Case
+
+# Case 1
+> MODE all
+> out count max1 max2 mean1 mean2 median1 median2 min1 min2
+229
+2469.
+40729
+44I5
+NYSU5221
+
+# Case 2
+> mode earliest
+> out code date val1 val2
+229
+2469.
+40729
+44I5
+NYSU5221
+
+# Case 3
+> mode latest
+> out code date val1 val2
+229
+2469.
+40729
+44I5
+NYSU5221
+
+# Case 4
+> mode max1
+> out code date val1 val2
+229
+2469.
+40729
+44I5
+NYSU5221
+
+# Case 5
+> mode max2
+> out code date val1 val2
+229
+2469.
+40729
+44I5
+NYSU5221
+
+# Case 6
+> mode min1
+> out code date val1 val2
+229
+2469.
+40729
+44I5
+NYSU5221
+
+# Case 7
+> mode min2
+> out code date val1 val2
+229
+2469.
+40729
+44I5
+NYSU5221
