@@ -53,7 +53,7 @@ def main(fileCaseDefs, dirOutput, filePatientData, fileCodeDescriptions, filePat
     with open(filePatientData, 'r') as fidPatientData, open(fileExtractIon, 'w') as fidExtraction:
         # Write out the header.
         extractions = '\t'.join(
-            ["{:s}__MODE-{:s}__OUT-{:s}".format(i, j, k)
+            ["{:s}__MODE_{:s}__OUT_{:s}".format(i, j, k)
              for i in caseNames for j in caseDefinitions[i]["Modes"] for k in caseDefinitions[i]["Outputs"]]
         )
         header = "PatientID\t{:s}\n".format(extractions)
