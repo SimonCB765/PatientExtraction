@@ -62,7 +62,7 @@ def count_outputter(record):
         return "{:d}".format(count)
     else:
         # The record is empty.
-        return ''
+        return '0'
 
 
 def date_outputter(record):
@@ -212,8 +212,8 @@ def median_outputter(valType):
             # Get the median value over the associations.
             middleIndex = len(associationValues) // 2
             if len(associationValues) % 2 == 0:
-                # There are an even number of code associations in the patient's record, so the median is the mean of the
-                # middle two values
+                # There are an even number of code associations in the patient's record, so the median is the mean of
+                # the middle two values
                 medianValue = sum(associationValues[middleIndex - 1:middleIndex + 1]) / 2
             else:
                 # There are an odd number of code associations in the patient's record, so te median is the middle one.
