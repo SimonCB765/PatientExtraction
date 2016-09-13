@@ -12,7 +12,7 @@ isLogging = True
 validChoices = {}  # The valid modes, outputs and operators that can appear in a case definition file.
 
 
-def init(args=None):
+def init():
     """Initialise the settings-like variables."""
 
     # Initialise the dictionary of valid modes, outputs and operators that can appear in a case definition file.
@@ -23,7 +23,8 @@ def init(args=None):
                   "max2": record_selector.max_selector("Val2"),
                   "min1": record_selector.min_selector("Val1"),
                   "min2": record_selector.min_selector("Val2")}  # The valid code selection modes.
-    validOutputs = {"code": record_outputter.code_outputter,
+    validOutputs = {"exists": record_outputter.exists_outputter,
+                    "code": record_outputter.code_outputter,
                     "count": record_outputter.count_outputter,
                     "date": record_outputter.date_outputter,
                     "max1": record_outputter.max_outputter("Val1"),
@@ -43,7 +44,12 @@ def init(args=None):
 
 
 def control_logging(isOn=True):
-    """Turn the logging on or off."""
+    """Turn the logging on or off.
+
+    :param isOn:    Whether logging should be turned on.
+    :type isOn:     bool
+
+    """
 
     global isLogging
     isLogging = isOn

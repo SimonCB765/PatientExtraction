@@ -2,7 +2,7 @@
 
 # Case 1
 > MODE all
-> out count max1 max2 mean1 mean2 median1 median2 min1 min2
+> out count exists max1 max2 mean1 mean2 median1 median2 min1 min2
 229
 2469.
 40729

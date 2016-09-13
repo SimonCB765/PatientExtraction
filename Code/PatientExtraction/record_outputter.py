@@ -95,6 +95,23 @@ def date_outputter(record):
         return ''
 
 
+def exists_outputter(record):
+    """Function to output whether there are any associations remaining in the record.
+
+    Outputs a 0 if there are no associations and a 1 otherwise.
+
+    This function is primarily used when the record may contain multiple records, i.e. when the mode is all.
+
+    :param record:  A patient's medical record selected for outputting.
+    :type record:   dict
+    :return:        The contents of the record that should be output.
+    :rtype:         str
+
+    """
+
+    return '1' if record else '0'
+
+
 def max_outputter(valType):
     """Generate a function that will output the maximum valType value in the patient's record.
 

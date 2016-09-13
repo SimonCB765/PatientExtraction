@@ -1,12 +1,12 @@
 {
   "1": [
-    "code", "count", "date", "max1", "max2", "mean1", "mean2", "median1", "median2", "min1", "min2", "val1", "val2"
+    "code", "count", "date", "exists", "max1", "max2", "mean1", "mean2", "median1", "median2", "min1", "min2", "val1", "val2"
   ],
   "2": [
-    "count", "max1", "max2", "mean1", "mean2", "median1", "median2", "min1", "min2"
+    "count", "exists", "max1", "max2", "mean1", "mean2", "median1", "median2", "min1", "min2"
   ],
   "3": [
-    "count", "max1", "max2", "mean1", "mean2", "median1", "median2", "min1", "min2"
+    "count", "exists", "max1", "max2", "mean1", "mean2", "median1", "median2", "min1", "min2"
   ],
   "4": [
     "code", "date", "val1", "val2"
