@@ -65,12 +65,6 @@ class TestRestrictionApplication(unittest.TestCase):
             patientExpectedOutput = self.expectedOutput[i]
 
             # Generate the output for each method and check that it is correct.
-            if not patientRecord:
-                # Empty patient records should throw exceptions.
-                for j in patientOutputChoices:
-                    self.assertRaises(Exception, conf.validChoices["Outputs"][j])
-            else:
-                # Patient records with associations in them should generate output.
-                for j in patientOutputChoices:
-                    generatedOutput = conf.validChoices["Outputs"][j](patientRecord)
-                    self.assertEqual(generatedOutput, patientExpectedOutput[j])
+            for j in patientOutputChoices:
+                generatedOutput = conf.validChoices["Outputs"][j](patientRecord)
+                self.assertEqual(generatedOutput, patientExpectedOutput[j])
