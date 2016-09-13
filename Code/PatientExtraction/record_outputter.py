@@ -33,9 +33,14 @@ def code_outputter(record):
 
     """
 
-    # Get an arbitrary code from the patient's record. This will extract the 'first' code from the record dictionary.
-    code = next(iter(record))
-    return "{:s}".format(code)
+    if record:
+        # Get an arbitrary code from the patient's record. This will extract the 'first' code from the record
+        # dictionary.
+        code = next(iter(record))
+        return "{:s}".format(code)
+    else:
+        # The record is empty.
+        return ''
 
 
 def count_outputter(record):
@@ -50,10 +55,14 @@ def count_outputter(record):
 
     """
 
-    # Get the number of associations between the patient and each code in their record (via len), and then sum these
-    # numbers.
-    count = sum(map(len, record.values()))
-    return "{:d}".format(count)
+    if record:
+        # Get the number of associations between the patient and each code in their record (via len), and then sum these
+        # numbers.
+        count = sum(map(len, record.values()))
+        return "{:d}".format(count)
+    else:
+        # The record is empty.
+        return ''
 
 
 def date_outputter(record):
@@ -72,13 +81,18 @@ def date_outputter(record):
 
     """
 
-    # Get an arbitrary code from the patient's record. This will extract the 'first' code from the record dictionary.
-    code = next(iter(record))
+    if record:
+        # Get an arbitrary code from the patient's record. This will extract the 'first' code from the record
+        # dictionary.
+        code = next(iter(record))
 
-    # Get an arbitrary date associated with the code. As records are sorted chronologically, this will get the
-    # earliest date in the record that the code was associated with the patient.
-    date = record[code][0]["Date"]
-    return "{:s}".format(date.strftime("%Y-%m-%d"))
+        # Get an arbitrary date associated with the code. As records are sorted chronologically, this will get the
+        # earliest date in the record that the code was associated with the patient.
+        date = record[code][0]["Date"]
+        return "{:s}".format(date.strftime("%Y-%m-%d"))
+    else:
+        # The record is empty.
+        return ''
 
 
 def max_outputter(valType):
@@ -106,14 +120,18 @@ def max_outputter(valType):
 
         """
 
-        # Combine all code associations into one list.
-        associations = [k for j in record.values() for k in j]
+        if record:
+            # Combine all code associations into one list.
+            associations = [k for j in record.values() for k in j]
 
-        # Get the code association with the maximum value.
-        maxAssociation = max(associations, key=lambda x: x[valType])
+            # Get the code association with the maximum value.
+            maxAssociation = max(associations, key=lambda x: x[valType])
 
-        # Return the valType value from this maximum association.
-        return "{:.2f}".format(maxAssociation[valType])
+            # Return the valType value from this maximum association.
+            return "{:.2f}".format(maxAssociation[valType])
+        else:
+            # The record is empty.
+            return ''
 
     return outputter
 
@@ -143,14 +161,18 @@ def mean_outputter(valType):
 
         """
 
-        # Combine all the valType values of the code associations into one list.
-        associationValues = [k[valType] for j in record.values() for k in j]
+        if record:
+            # Combine all the valType values of the code associations into one list.
+            associationValues = [k[valType] for j in record.values() for k in j]
 
-        # Get the mean value over the associations.
-        meanValue = sum(associationValues) / len(associationValues)
+            # Get the mean value over the associations.
+            meanValue = sum(associationValues) / len(associationValues)
 
-        # Return the valType value from this mean association.
-        return "{:.2f}".format(meanValue)
+            # Return the valType value from this mean association.
+            return "{:.2f}".format(meanValue)
+        else:
+            # The record is empty.
+            return ''
 
     return outputter
 
@@ -179,25 +201,29 @@ def median_outputter(valType):
 
         """
 
-        # Combine all the valType values of the code associations into one list and sort them.
-        associationValues = sorted([k[valType] for j in record.values() for k in j])
+        if record:
+            # Combine all the valType values of the code associations into one list and sort them.
+            associationValues = sorted([k[valType] for j in record.values() for k in j])
 
-        # If there is only one record, then return that record.
-        if len(associationValues) == 1:
-            return "{:.2f}".format(associationValues[0])
+            # If there is only one record, then return that record.
+            if len(associationValues) == 1:
+                return "{:.2f}".format(associationValues[0])
 
-        # Get the median value over the associations.
-        middleIndex = len(associationValues) // 2
-        if len(associationValues) % 2 == 0:
-            # There are an even number of code associations in the patient's record, so the median is the mean of the
-            # middle two values
-            medianValue = sum(associationValues[middleIndex - 1:middleIndex + 1]) / 2
+            # Get the median value over the associations.
+            middleIndex = len(associationValues) // 2
+            if len(associationValues) % 2 == 0:
+                # There are an even number of code associations in the patient's record, so the median is the mean of the
+                # middle two values
+                medianValue = sum(associationValues[middleIndex - 1:middleIndex + 1]) / 2
+            else:
+                # There are an odd number of code associations in the patient's record, so te median is the middle one.
+                medianValue = associationValues[middleIndex]
+
+            # Return the valType value from this median association.
+            return "{:.2f}".format(medianValue)
         else:
-            # There are an odd number of code associations in the patient's record, so te median is the middle one.
-            medianValue = associationValues[middleIndex]
-
-        # Return the valType value from this median association.
-        return "{:.2f}".format(medianValue)
+            # The record is empty.
+            return ''
 
     return outputter
 
@@ -227,14 +253,18 @@ def min_outputter(valType):
 
         """
 
-        # Combine all code associations into one list.
-        associations = [k for j in record.values() for k in j]
+        if record:
+            # Combine all code associations into one list.
+            associations = [k for j in record.values() for k in j]
 
-        # Get the code association with the minimum value.
-        minAssociation = min(associations, key=lambda x: x[valType])
+            # Get the code association with the minimum value.
+            minAssociation = min(associations, key=lambda x: x[valType])
 
-        # Return the valType value from this minimum association.
-        return "{:.2f}".format(minAssociation[valType])
+            # Return the valType value from this minimum association.
+            return "{:.2f}".format(minAssociation[valType])
+        else:
+            # The record is empty.
+            return ''
 
     return outputter
 
@@ -265,13 +295,17 @@ def value_outputter(valType):
 
         """
 
-        # Get an arbitrary code from the patient's record. This will extract the 'first' code from the record
-        # dictionary.
-        code = next(iter(record))
+        if record:
+            # Get an arbitrary code from the patient's record. This will extract the 'first' code from the record
+            # dictionary.
+            code = next(iter(record))
 
-        # Get an arbitrary value associated with the code. As records are sorted chronologically, this will get the
-        # value associated with the earliest association in the record between the code and the patient.
-        value = record[code][0][valType]
-        return "{:.2f}".format(value)
+            # Get an arbitrary value associated with the code. As records are sorted chronologically, this will get the
+            # value associated with the earliest association in the record between the code and the patient.
+            value = record[code][0][valType]
+            return "{:.2f}".format(value)
+        else:
+            # The record is empty.
+            return ''
 
     return outputter

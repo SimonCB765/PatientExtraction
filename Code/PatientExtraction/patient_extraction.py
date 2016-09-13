@@ -182,24 +182,11 @@ def generate_patient_output(extractedHistory, caseNames, caseDefinitions):
     generatedOutput = []  # The output for the patient.
 
     for i in caseNames:
-        # Get the modes used with this case definition that the patient has extracted data for.
-        modesWithData = {j for j, k in extractedHistory[i].items() if k}
-        if modesWithData:
-            # The patient has a mode for this case definition for which some data was extracted.
-            for mode in caseDefinitions[i]["Modes"]:
-                if mode in modesWithData:
-                    # If using the given mode managed to collect any associations.
-                    extractedModeData = extractedHistory[i][mode]  # Data extracted using the mode.
-                    for out in caseDefinitions[i]["Outputs"]:
-                        generatedOutput.append(conf.validChoices["Outputs"][out](extractedModeData))
-                else:
-                    # Add blanks for each column associated with this mode, as using it we didn't get any association.
-                    generatedOutput.extend(['' for _ in caseDefinitions[i]["Outputs"]])
-        else:
-            # Add blanks for each column if the case does not apply to the patient.
-            generatedOutput.extend(
-                ['' for _ in caseDefinitions[i]["Modes"] for _ in caseDefinitions[i]["Outputs"]]
-            )
+        # Go through the modes used with this case definition and generate the required output for each one.
+        for mode in caseDefinitions[i]["Modes"]:
+            extractedModeData = extractedHistory[i][mode]  # Data extracted using the mode.
+            for out in caseDefinitions[i]["Outputs"]:
+                generatedOutput.append(conf.validChoices["Outputs"][out](extractedModeData))
 
     return '\t'.join(generatedOutput)
 
