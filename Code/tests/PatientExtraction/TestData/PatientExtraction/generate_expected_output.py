@@ -1,16 +1,23 @@
-"""Script to generate the expected output (minus the header) for the full patient extraction."""
+"""Script to generate the expected output (minus the header) for the full patient extraction.
+
+Must be called from the Code directory as:
+python -m Code.tests.PatientExtraction.TestData.PatientExtraction.generate_expected_output
+
+"""
 
 # Python imports.
 import json
 import numpy
+import os
 
 # User imports.
-from Code.PatientExtraction import record_selector as rs
+from .....PatientExtraction import record_selector as rs
 
 # The location of the dataset of patients being used and the location to generate the output.
-fileData = "C:\\Users\\sb0080.UWS30079\\Documents\\PatientExtraction\\Code\\tests\\PatientExtraction\\TestData" \
-           "\\PatientExtraction\\FlatPatientData.tsv"
-fileOut = "C:\\Users\\sb0080.UWS30079\\Documents\\PatientExtraction\\ExpectedTestOutput.tsv"
+dirData = os.path.join(os.path.abspath(os.getcwd()), "Code", "tests", "PatientExtraction", "TestData",
+                       "PatientExtraction")
+fileData = os.path.join(dirData, "FlatPatientData.tsv")
+fileOut = os.path.join(dirData, "ExpectedTestOutput.tsv")
 
 # The codes to restrict the extraction to.
 codes = ["229", "2469", "40729", "44I5", "NYSU5221"]
@@ -33,7 +40,8 @@ with open(fileData, 'r') as fid, open(fileOut, 'w') as fidOut:
                 v2.append(j["Val2"])
 
         # Extract output values for mode all.
-        count = "{:d}".format(len(v1)) if v1 else ''
+        count = "{:d}".format(len(v1)) if v1 else '0'
+        exists = "{:d}".format(1 if v1 else 0)
         maxV1 = "{:.2f}".format(max(v1)) if v1 else ''
         maxV2 = "{:.2f}".format(max(v2)) if v2 else ''
         meanV1 = "{:.2f}".format(numpy.mean(v1)) if v1 else ''
@@ -98,9 +106,9 @@ with open(fileData, 'r') as fid, open(fileOut, 'w') as fidOut:
 
         # Write the output for this patient.
         fidOut.write(
-            "{}\t\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}"
-            "\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(
-                chunks[0], count, maxV1, maxV2, meanV1, meanV2, medianV1, medianV2, minV1, minV2,
+            "{}\t0\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}"
+            "\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(
+                chunks[0], count, exists, maxV1, maxV2, meanV1, meanV2, medianV1, medianV2, minV1, minV2,
                 earliestCode, earliestDate, earliestVal1, earliestVal2,
                 latestCode, latestDate, latestVal1, latestVal2,
                 max1Code, max1Date, max1Val1, max1Val2,
