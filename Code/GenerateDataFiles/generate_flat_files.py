@@ -67,7 +67,13 @@ def main(filePatients, fileOutput):
 
                 # Update the patient's data.
                 currentPatient = patientID
-                patientData[code].append({"Date": date, "Val1": value1, "Val2": value2, "Text": freeText})
+                if code:
+                    # There was a code recorded for this association.
+                    patientData[code].append({"Date": date, "Val1": value1, "Val2": value2, "Text": freeText})
+                else:
+                    # There was no code recorded for this association. For example, the association looks like:
+                    # 3123336,'','2004-11-01',0.0000,0.0000,null
+                    continue
 
     # Record the final patient's data.
     save_patient(currentPatient, patientData, fileOutput)
