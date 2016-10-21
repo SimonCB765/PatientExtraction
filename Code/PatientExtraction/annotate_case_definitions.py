@@ -37,7 +37,7 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions):
     # ============================= #
     # Annotate the Case Definitions #
     # ============================= #
-    codeMatcher = re.compile("^-?[a-zA-Z0-9%]")  # Regular expression to identify correctly formatted codes.
+    codeMatcher = re.compile("^-?[a-zA-Z0-9]*\.*%?$")  # Regular expression to identify correctly formatted codes.
     currentCaseCodes = {"Negative": set([]), "Positive": set([])}
     with open(fileDefinitions, 'r') as fidDefinitions, open(fileAnnotateDefinitions, 'w') as fidAnnotateDefinitions:
         for lineNum, line in enumerate(fidDefinitions):
@@ -259,30 +259,35 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions):
                                        "one of mode, out, from, val1 or val2.".format(lineNum + 1, chunks[0]))
             elif codeMatcher.match(line):
                 # The line contains a code for a condition
-                code = line.replace('.', '')
+                print(line)
 
                 # Determine if the code is a negated code.
                 codeType = "Positive"
-                if code[0] == '-':
+                if line[0] == '-':
                     # Found a negated code
                     codeType = "Negative"
-                    code = code[1:]
+                    line = line[1:]
 
-                # Determine if the code needs expanding to include child codes.
-                codeList = []
-                if code[-1] == '%':
-                    # Found a code that needs expanding to include child codes.
-                    code = code[:-1]
-                    codeList = [i for i in mapCodeToDescription if i[:len(code)] == code]
-                if codeList:
-                    # The code had a % at the end and had matching codes found in the code to description mapping.
-                    for i in codeList:
-                        currentCaseCodes[codeType].add(i)
-                else:
-                    # The code either did not have a % at the end or did but had no matching codes in the code to
-                    # description mapping. In either case, add the code itself to the list of indicator codes for the
-                    # case.
-                    currentCaseCodes[codeType].add(code)
+                # Remove trailing full stops.
+                code = line.replace('.', '')
+
+                if code:
+                    # If the line is not empty once an initial negative sign and trailing full stops are removed, then
+                    # determine if the code needs expanding to include child codes.
+                    codeList = []
+                    if code[-1] == '%':
+                        # Found a code that needs expanding to include child codes.
+                        code = code[:-1]
+                        codeList = [i for i in mapCodeToDescription if i[:len(code)] == code]
+                    if codeList:
+                        # The code had a % at the end and had matching codes found in the code to description mapping.
+                        for i in codeList:
+                            currentCaseCodes[codeType].add(i)
+                    else:
+                        # The code either did not have a % at the end or did but had no matching codes in the code to
+                        # description mapping. In either case, add the code itself to the list of indicator codes for
+                        # the case.
+                        currentCaseCodes[codeType].add(code)
             else:
                 # The line does not appear to contain valid information, so log this and skip it.
                 if conf.isLogging:
