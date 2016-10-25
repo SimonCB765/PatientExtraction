@@ -45,8 +45,8 @@ parser.add_argument("-o", "--output",
                          "subdirectory in the Results directory.",
                     type=str)
 parser.add_argument("-p", "--patient",
-                    help="The location of the file containing the IDs' of the patients that the extraction should be "
-                         "restricted to. Default: a file PatientSubset.txt in the Data directory.",
+                    help="The location of the file containing the IDs of the patients that the extraction should be "
+                         "restricted to (one ID per line). Default: a file PatientSubset.txt in the Data directory.",
                     type=str)
 parser.add_argument("-w", "--overwrite",
                     action="store_true",

@@ -259,7 +259,6 @@ def main(fileDefinitions, fileCodeDescriptions, fileAnnotateDefinitions):
                                        "one of mode, out, from, val1 or val2.".format(lineNum + 1, chunks[0]))
             elif codeMatcher.match(line):
                 # The line contains a code for a condition
-                print(line)
 
                 # Determine if the code is a negated code.
                 codeType = "Positive"

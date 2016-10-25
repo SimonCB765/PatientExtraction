@@ -28,7 +28,7 @@ parser = argparse.ArgumentParser(description="Extract patient data according to 
 # Optional arguments.
 parser.add_argument("-p", "--patient",
                     help="The location of the file containing the patient medical history data in SQL insert format. "
-                         "Default: a file journal.sql in the Data directory.",
+                         "Default: a file called journal.sql in the Data directory.",
                     type=str)
 parser.add_argument("-o", "--output",
                     help="The location of the file to write the output files to. Default: a file called "

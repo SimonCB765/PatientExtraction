@@ -23,10 +23,10 @@ def init():
                   "max2": record_selector.max_selector("Val2"),
                   "min1": record_selector.min_selector("Val1"),
                   "min2": record_selector.min_selector("Val2")}  # The valid code selection modes.
-    validOutputs = {"exists": record_outputter.exists_outputter,
-                    "code": record_outputter.code_outputter,
+    validOutputs = {"code": record_outputter.code_outputter,
                     "count": record_outputter.count_outputter,
                     "date": record_outputter.date_outputter,
+                    "exists": record_outputter.exists_outputter,
                     "max1": record_outputter.max_outputter("Val1"),
                     "max2": record_outputter.max_outputter("Val2"),
                     "mean1": record_outputter.mean_outputter("Val1"),
